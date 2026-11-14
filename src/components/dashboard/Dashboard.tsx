@@ -184,7 +184,7 @@ export default function Dashboard({ data, loadError }: { data: DashboardData; lo
                         <button className="btn btn-ghost btn-sm" onClick={() => setEditor({ project: p })}>Edit</button>
                         {p.visibility === "published" ? (
                           <>
-                            <a className="btn btn-ghost btn-sm" href={`/?p=${p.slug}`} target="_blank" rel="noopener">View ↗</a>
+                            <a className="btn btn-ghost btn-sm" href={`/p/${p.slug}`} target="_blank" rel="noopener">View ↗</a>
                             <button className="btn btn-ghost btn-sm" onClick={() => setVisibility(p, "draft")}>Unpublish</button>
                           </>
                         ) : p.visibility === "draft" ? (

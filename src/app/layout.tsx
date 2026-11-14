@@ -17,7 +17,10 @@ export const viewport: Viewport = { themeColor: "#040407", width: "device-width"
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[200] focus:rounded-[3px] focus:bg-accent focus:px-4 focus:py-2 focus:text-white">Skip to content</a>
+        {children}
+      </body>
     </html>
   );
 }

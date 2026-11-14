@@ -482,7 +482,7 @@ export default function BatIntro() {
   const finish = useCallback(() => {
     stopLoop.current?.(); stopLoop.current = null;
     audio.current?.stop(); audio.current = null;
-    try { sessionStorage.setItem(KEY, "1"); } catch { /* private mode */ }
+    try { localStorage.setItem(KEY, String(Date.now())); } catch { /* private mode */ }
     setFade(true);
     window.setTimeout(() => setShow(false), 700);
   }, []);
@@ -505,10 +505,9 @@ export default function BatIntro() {
 
   useEffect(() => {
     let seen = false;
-    try { seen = sessionStorage.getItem(KEY) === "1"; } catch { /* ignore */ }
+    try { const t = Number(localStorage.getItem(KEY)); seen = t > 0 && Date.now() - t < 14 * 864e5; } catch { /* ignore */ }
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const deepLink = new URLSearchParams(window.location.search).has("p");
-    if (seen || reduce || deepLink) setShow(false);
+    if (seen || reduce) setShow(false);
     const replay = () => { setPhase("gate"); setFade(false); setShow(true); };
     window.addEventListener("ghost-intro-replay", replay);
     return () => window.removeEventListener("ghost-intro-replay", replay);
@@ -541,7 +540,8 @@ export default function BatIntro() {
             <button className="btn btn-primary min-h-12 w-full px-9 text-sm uppercase tracking-[0.25em] sm:w-auto" onClick={() => start(true)} autoFocus>Enter the darkness</button>
             <button className="btn btn-ghost min-h-12 w-full px-6 text-xs uppercase tracking-[0.2em] sm:w-auto" onClick={() => start(false)}>Silent mode</button>
           </div>
-          <button className="mt-7 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-faint transition-colors hover:text-muted" onClick={finish}>Bypass sequence</button>
+          <p className="mt-6 max-w-sm text-[11px] leading-relaxed text-faint">Contains sudden flashes of light and sound. Choose Silent mode or Bypass if you are sensitive to either.</p>
+          <button className="mt-3 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-faint transition-colors hover:text-muted" onClick={finish}>Bypass sequence</button>
         </div>
       ) : (
         <div className="absolute inset-x-0 bottom-0 z-30 flex items-center justify-between px-6 py-6 sm:px-10">
