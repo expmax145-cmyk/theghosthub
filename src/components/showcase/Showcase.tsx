@@ -6,7 +6,7 @@ import { STATUS_LABEL } from "@/lib/types";
 import BatIntro from "./BatIntro";
 import { cx, formatBytes, formatDate, safeUrl } from "@/lib/utils";
 
-type Sort = "recent" | "name" | "oldest";
+type Sort = "recent" | "newest" | "name" | "oldest";
 
 function initials(name: string) {
   return name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("") || "•";
@@ -112,7 +112,7 @@ function Detail({ p, onClose }: { p: ShowcaseProject; onClose: () => void }) {
 
         {(current || p.thumb) && (
           <section aria-label="Screenshots" className="space-y-3">
-            <div className="overflow-hidden rounded-xl border border-line bg-surface">
+            <div className="overflow-hidden rounded-[4px] border border-line bg-surface">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={current?.url ?? p.thumb!} alt={`${p.name} screenshot`} className="max-h-[70vh] w-full object-contain" />
             </div>
@@ -120,7 +120,7 @@ function Detail({ p, onClose }: { p: ShowcaseProject; onClose: () => void }) {
               <div className="scrollbar-none flex gap-2 overflow-x-auto pb-1">
                 {media.map((s, i) => (
                   <button key={s.id} onClick={() => setShot(i)} aria-label={`Screenshot ${i + 1}`} aria-current={i === shot}
-                    className={cx("h-16 w-24 shrink-0 overflow-hidden rounded-lg border", i === shot ? "border-accent" : "border-line opacity-70 hover:opacity-100")}>
+                    className={cx("h-16 w-24 shrink-0 overflow-hidden rounded-[3px] border", i === shot ? "border-accent" : "border-line opacity-70 hover:opacity-100")}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={s.url!} alt="" loading="lazy" className="h-full w-full object-cover" />
                   </button>
@@ -131,7 +131,7 @@ function Detail({ p, onClose }: { p: ShowcaseProject; onClose: () => void }) {
         )}
 
         {p.videos.filter((v) => v.url).map((v) => (
-          <video key={v.id} src={v.url!} controls preload="metadata" playsInline className="w-full rounded-xl border border-line bg-black" />
+          <video key={v.id} src={v.url!} controls preload="metadata" playsInline className="w-full rounded-[4px] border border-line bg-black" />
         ))}
 
         {p.description && (
@@ -238,9 +238,12 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
     return [...list].sort((a, b) =>
       sort === "name" ? a.name.localeCompare(b.name)
         : sort === "oldest" ? +new Date(a.created_on) - +new Date(b.created_on)
+        : sort === "newest" ? +new Date(b.created_on) - +new Date(a.created_on)
         : +new Date(b.updated_at) - +new Date(a.updated_at));
   }, [projects, q, cat, tech, sort]);
 
+  const filtersActive = Boolean(q || tech || cat !== "All" || sort !== "recent");
+  const resetFilters = () => { setQ(""); setCat("All"); setTech(""); setSort("recent"); };
   const featured = projects.filter((p) => p.is_featured).slice(0, 3);
   const showFeatured = featured.length > 0 && !q && cat === "All" && !tech;
   const recent = [...projects].sort((a, b) => +new Date(b.updated_at) - +new Date(a.updated_at)).slice(0, 3);
@@ -255,24 +258,41 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
           <a href="#top" className="font-display text-lg tracking-tight"><span className="eyes" aria-hidden="true"><i /><i /></span>Ghost<span className="text-accent"> Hub</span></a>
           <nav className="flex items-center gap-5 text-sm text-muted">
             <a href="#work" className="hover:text-text">Work</a>
-            <Link href="/studio" className="rounded-lg border border-accent/50 px-3 py-1.5 text-[13px] hover:bg-raised hover:text-text">Creator sign in</Link>
+            <Link href="/studio" className="rounded-[3px] border border-accent/50 px-3 py-1.5 text-[13px] hover:bg-raised hover:text-text">Creator sign in</Link>
           </nav>
         </div>
       </header>
 
       <main id="top">
-        <section className="mx-auto max-w-6xl px-4 pb-14 pt-14 sm:px-6 sm:pb-20 sm:pt-24">
-          <p className="rise text-xs uppercase tracking-[0.22em] text-accent">Ghost Hub</p>
-          <h1 className="rise glow-text mt-5 max-w-3xl font-display text-[2.6rem] leading-[1.05] tracking-tight sm:text-7xl" style={{ animationDelay: "60ms" }}>
-            {profile?.headline || `Ghost Hub: things built, shipped and still being tinkered with.`}
-          </h1>
-          <p className="rise mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg" style={{ animationDelay: "120ms" }}>
-            {profile?.bio || "Android apps, games, websites and AI experiments, collected in one place."}
-          </p>
-          <dl className="rise mt-10 flex flex-wrap gap-x-10 gap-y-4 border-t border-accent/30 pt-6" style={{ animationDelay: "180ms" }}>
-            <div><dt className="text-xs uppercase tracking-[0.14em] text-faint">Creations</dt><dd className="font-display text-3xl">{projects.length}</dd></div>
-            <div><dt className="text-xs uppercase tracking-[0.14em] text-faint">Categories</dt><dd className="font-display text-3xl">{categories.length}</dd></div>
-            <div><dt className="text-xs uppercase tracking-[0.14em] text-faint">Technologies</dt><dd className="font-display text-3xl">{techs.length}</dd></div>
+        <section className="relative isolate overflow-hidden border-b border-line" aria-labelledby="hero-title">
+          <div className="hero-glow absolute inset-0 -z-10" aria-hidden="true" />
+          <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-14 sm:px-6 sm:pb-20 sm:pt-24 lg:grid-cols-[1.35fr_1fr]">
+            <div>
+              <p className="rise flex items-center gap-3 text-xs uppercase tracking-[0.28em] text-accent"><span className="h-px w-10 bg-accent" aria-hidden="true" />Digital headquarters</p>
+              <h1 id="hero-title" className="rise glow-text mt-6 max-w-3xl font-display text-[2.5rem] leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl" style={{ animationDelay: "60ms" }}>
+                {profile?.headline || "Ghost Hub: things built, shipped and still being tinkered with."}
+              </h1>
+              <p className="rise mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg" style={{ animationDelay: "120ms" }}>
+                {profile?.bio || "Android apps, games, websites and AI experiments, collected in one place."}
+              </p>
+              <div className="rise mt-9 flex flex-wrap items-center gap-3" style={{ animationDelay: "180ms" }}>
+                <a href="#work" className="btn btn-primary px-6">Explore the creations <span aria-hidden="true">&darr;</span></a>
+                {featured.length > 0 && <a href="#featured" className="btn btn-ghost px-6">Featured</a>}
+              </div>
+            </div>
+            <svg className="ghost-mark rise mx-auto w-56 max-w-full sm:w-72 lg:w-full lg:max-w-sm" viewBox="0 0 320 320" fill="none" aria-hidden="true" style={{ animationDelay: "240ms" }}>
+              <circle className="ring" cx="160" cy="160" r="150" stroke="#e0212c" strokeOpacity="0.35" />
+              <circle className="ring" cx="160" cy="160" r="112" stroke="#e0212c" strokeOpacity="0.5" />
+              <circle className="ring" cx="160" cy="160" r="74" stroke="#e0212c" strokeOpacity="0.7" />
+              <path d="M160 6v60M160 254v60M6 160h60M254 160h60" stroke="#2a2a33" />
+              <polygon points="92,142 148,154 156,176 138,182 108,174 100,160" fill="#ff1219" />
+              <polygon points="228,142 172,154 164,176 182,182 212,174 220,160" fill="#ff1219" />
+            </svg>
+          </div>
+          <dl className="rise mx-auto grid max-w-6xl grid-cols-3 border-t border-accent/30 px-4 sm:px-6" style={{ animationDelay: "300ms" }}>
+            <div className="py-5"><dt className="text-[11px] uppercase tracking-[0.16em] text-faint sm:text-xs">Creations</dt><dd className="font-display text-3xl sm:text-4xl">{projects.length}</dd></div>
+            <div className="border-l border-line py-5 pl-4 sm:pl-8"><dt className="text-[11px] uppercase tracking-[0.16em] text-faint sm:text-xs">Categories</dt><dd className="font-display text-3xl sm:text-4xl">{categories.length}</dd></div>
+            <div className="border-l border-line py-5 pl-4 sm:pl-8"><dt className="text-[11px] uppercase tracking-[0.16em] text-faint sm:text-xs">Technologies</dt><dd className="font-display text-3xl sm:text-4xl">{techs.length}</dd></div>
           </dl>
         </section>
 
@@ -291,15 +311,15 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
         ) : (
           <>
             {showFeatured && (
-              <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6" aria-labelledby="featured">
-                <h2 id="featured" className="mb-5 font-display text-2xl sm:text-3xl">Featured</h2>
+              <section id="featured" className="reveal mx-auto max-w-6xl scroll-mt-16 px-4 pb-14 pt-14 sm:px-6" aria-labelledby="featured-title">
+                <h2 id="featured-title" className="mb-5 font-display text-2xl sm:text-3xl">Featured</h2>
                 <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                   {featured.map((p, i) => <Card key={p.id} p={p} index={i} large onOpen={() => open(p.slug)} />)}
                 </div>
               </section>
             )}
 
-            <section id="work" className="mx-auto max-w-6xl scroll-mt-16 px-4 pb-24 sm:px-6" aria-labelledby="all-work">
+            <section id="work" className="mx-auto max-w-6xl scroll-mt-16 px-4 pb-24 pt-4 sm:px-6" aria-labelledby="all-work">
               <h2 id="all-work" className="mb-5 font-display text-2xl sm:text-3xl">All creations</h2>
 
               <div className="space-y-3">
@@ -312,6 +332,7 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
                   </select>
                   <select className="field sm:w-44" value={sort} onChange={(e) => setSort(e.target.value as Sort)} aria-label="Sort projects">
                     <option value="recent">Recently updated</option>
+                    <option value="newest">Newest first</option>
                     <option value="oldest">Oldest first</option>
                     <option value="name">Name A–Z</option>
                   </select>
@@ -322,6 +343,16 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
                     <button key={c} className="chip" aria-pressed={cat === c} onClick={() => setCat(c)}>{c} <span className="ml-1.5 text-faint">{n}</span></button>
                   ))}
                 </div>
+                {filtersActive && (
+                  <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted" role="status">
+                    <span>Filters active:</span>
+                    {q && <span className="tag">&ldquo;{q}&rdquo;</span>}
+                    {cat !== "All" && <span className="tag">{cat}</span>}
+                    {tech && <span className="tag">{tech}</span>}
+                    {sort !== "recent" && <span className="tag">sorted: {sort}</span>}
+                    <button className="text-accent underline-offset-4 hover:underline" onClick={resetFilters}>Reset filters</button>
+                  </p>
+                )}
               </div>
 
               {projects.length === 0 ? (
@@ -332,7 +363,7 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
               ) : filtered.length === 0 ? (
                 <div className="card mt-8 p-8 text-center">
                   <p className="font-display text-xl">No matches.</p>
-                  <button className="btn btn-ghost btn-sm mt-4" onClick={() => { setQ(""); setCat("All"); setTech(""); }}>Clear filters</button>
+                  <button className="btn btn-ghost btn-sm mt-4" onClick={resetFilters}>Reset filters</button>
                 </div>
               ) : (
                 <>

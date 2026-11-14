@@ -112,8 +112,8 @@ export default function Dashboard({ data, loadError }: { data: DashboardData; lo
 
         {err && <p role="alert" className="rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm text-danger">{err}</p>}
 
-        <section className="grid grid-cols-2 gap-3 md:grid-cols-5" aria-label="Overview">
-          {[["Projects", projects.length], ["Files", files.length], ["Published", counts.published], ["Drafts", counts.draft], ["Storage", formatBytes(used)]].map(([l, v]) => (
+        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7" aria-label="Overview">
+          {[["Projects", projects.length], ["Published", counts.published], ["Drafts", counts.draft], ["Featured", projects.filter((x) => x.is_featured).length], ["Categories", categories.length], ["Files", files.length], ["Storage", formatBytes(used)]].map(([l, v]) => (
             <div key={l} className="card p-4"><p className="text-[11px] uppercase tracking-[0.14em] text-faint">{l}</p><p className="mt-1 font-display text-2xl">{v}</p></div>
           ))}
         </section>
