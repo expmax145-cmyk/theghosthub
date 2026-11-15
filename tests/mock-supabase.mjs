@@ -6,7 +6,7 @@ const now = "2026-11-10T10:00:00Z";
 const base = { description: "", features: [], tags: [], status: "released", visibility: "published", thumbnail_file_id: null, live_demo_url: null, video_url: null, extra_links: [], is_featured: false, created_on: "2026-05-01", published_at: now, created_at: now, updated_at: now, public_repository_url: null };
 const projects = [
   { ...base, id: U(1), name: "Apex Horizon 3D", slug: "apex-horizon-3d", category: "Games", technologies: ["Unity", "C#", "Android"], short_description: "A fast, low-poly Android racing game with a garage and tuning system.", description: "Apex Horizon is a mobile racing game built for mid-range phones.\n\nIt targets a stable 60 FPS and ships with touch and tilt controls.", features: ["60 FPS target on mid-range phones", "Garage and upgrades", "Tilt + touch steering"], is_featured: true, thumbnail_file_id: U(101), live_demo_url: "https://example.com/play", public_repository_url: "https://github.com/example/apex", extra_links: [{ label: "Devlog", url: "https://example.com/devlog" }] },
-  { ...base, id: U(2), name: "Streetside", slug: "streetside", category: "Websites", technologies: ["Next.js", "TypeScript", "Tailwind"], short_description: "A neighbourhood guide with live maps.", is_featured: true, thumbnail_file_id: U(102), updated_at: "2026-11-09T10:00:00Z" },
+  { ...base, id: U(2), name: "Streetside", slug: "streetside", category: "Websites", live_demo_url: "https://example.com/streetside", technologies: ["Next.js", "TypeScript", "Tailwind"], short_description: "A neighbourhood guide with live maps.", is_featured: true, thumbnail_file_id: U(102), updated_at: "2026-11-09T10:00:00Z" },
   { ...base, id: U(3), name: "Pocket Tutor", slug: "pocket-tutor", category: "AI Projects", technologies: ["Python", "LLM"], short_description: "An offline study assistant experiment.", status: "prototype", is_featured: true, updated_at: "2026-11-01T10:00:00Z" },
   { ...base, id: U(4), name: "Sprite Forge", slug: "sprite-forge", category: "Experiments", technologies: ["Canvas", "JavaScript"], short_description: "Procedural pixel-art generator running entirely in the browser.", thumbnail_file_id: U(103), updated_at: "2026-10-20T10:00:00Z" },
   { ...base, id: U(5), name: "Habit Orbit", slug: "habit-orbit", category: "Android Applications", technologies: ["Kotlin", "Jetpack Compose"], short_description: "A habit tracker with a calm orbit-style streak view.", updated_at: "2026-10-10T10:00:00Z" },
@@ -15,6 +15,7 @@ const mk = (n, pid, role, name, extra = {}) => ({ id: U(n), project_id: pid, rol
 const files = [
   mk(101, U(1), "thumbnail", "apex-thumb.png"), mk(102, U(2), "thumbnail", "street-thumb.png"), mk(103, U(4), "thumbnail", "sprite-thumb.png"),
   mk(104, U(1), "screenshot", "apex-1.png"), mk(105, U(1), "screenshot", "apex-2.png"),
+  mk(107, U(2), "screenshot", "street-1.png"), mk(108, U(2), "screenshot", "street-2.png"),
   mk(106, U(1), "attachment", "apex-horizon.apk", { mime_type: "application/vnd.android.package-archive", file_size: 41943040 }),
 ];
 const releases = [{ id: U(201), project_id: U(1), version: "1.2.0", release_notes: "New garage, FPS fixes.", release_date: "2026-11-01", visibility: "public" }];
