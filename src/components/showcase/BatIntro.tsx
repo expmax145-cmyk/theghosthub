@@ -484,7 +484,7 @@ export default function BatIntro() {
     audio.current?.stop(); audio.current = null;
     try { localStorage.setItem(KEY, String(Date.now())); } catch { /* private mode */ }
     setFade(true);
-    window.setTimeout(() => setShow(false), 700);
+    window.setTimeout(() => { document.documentElement.setAttribute("data-intro-seen", "1"); setShow(false); }, 700);
   }, []);
 
   const start = useCallback((sound: boolean) => {
@@ -508,7 +508,7 @@ export default function BatIntro() {
     try { const t = Number(localStorage.getItem(KEY)); seen = t > 0 && Date.now() - t < 14 * 864e5; } catch { /* ignore */ }
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (seen || reduce) setShow(false);
-    const replay = () => { setPhase("gate"); setFade(false); setShow(true); };
+    const replay = () => { document.documentElement.removeAttribute("data-intro-seen"); setPhase("gate"); setFade(false); setShow(true); };
     window.addEventListener("ghost-intro-replay", replay);
     return () => window.removeEventListener("ghost-intro-replay", replay);
   }, []);
@@ -527,7 +527,7 @@ export default function BatIntro() {
   if (!show) return null;
   return (
     <div role="dialog" aria-label="Intro animation" aria-modal="true"
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black transition-opacity duration-700" style={{ opacity: fade ? 0 : 1 }}>
+      data-intro="" className={"fixed inset-0 z-[100] flex items-center justify-center bg-black transition-opacity duration-700" + (fade ? " pointer-events-none" : "")} style={{ opacity: fade ? 0 : 1 }}>
       <noscript><style>{`[role=dialog][aria-label="Intro animation"]{display:none}`}</style></noscript>
       <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" aria-hidden="true" />
 

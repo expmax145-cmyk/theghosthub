@@ -16,7 +16,11 @@ export const viewport: Viewport = { themeColor: "#040407", width: "device-width"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Returning visitors and reduced-motion users never see the intro layer, even before scripts finish loading. */}
+        <script dangerouslySetInnerHTML={{ __html: 'try{var t=+localStorage.getItem("ghosthub-intro-seen");if((t>0&&Date.now()-t<12096e5)||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.setAttribute("data-intro-seen","1")}catch(e){}' }} />
+      </head>
       <body>
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[200] focus:rounded-[3px] focus:bg-accent focus:px-4 focus:py-2 focus:text-white">Skip to content</a>
         {children}
