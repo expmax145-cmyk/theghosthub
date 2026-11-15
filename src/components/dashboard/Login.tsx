@@ -63,7 +63,7 @@ export default function Login({ state, email, notice }: { state: State; email?: 
     <main className="flex min-h-dvh items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
         <Link href="/" className="font-display text-xl"><span className="eyes" aria-hidden="true"><i /><i /></span>Ghost<span className="text-accent"> Hub</span></Link>
-        <p className="mt-1 text-xs uppercase tracking-[0.18em] text-faint">Creator dashboard</p>
+        <p className="mt-1 text-xs uppercase tracking-[0.18em] text-faint">Creator dashboard &middot; only the keeper may pass</p>
 
         <div className="card card-major mt-6 p-5 sm:p-6">
           {state === "unconfigured" ? (

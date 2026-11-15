@@ -87,14 +87,14 @@ export default async function ProjectPage({ params }: Props) {
           <div className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:px-0" tabIndex={0} aria-label="Screenshots, scroll sideways">
             {shots.map((s, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={s.id} src={s.url!} alt={`${p.name} screenshot ${i + 1}`} loading={i < 2 ? "eager" : "lazy"} decoding="async" className="h-72 w-auto shrink-0 snap-start rounded-[8px] border border-line bg-surface object-contain sm:h-96" />
+              <img key={s.id} src={s.url!} alt={`${p.name} screenshot ${i + 1}`} loading={i < 2 ? "eager" : "lazy"} decoding="async" className="lit h-72 w-auto shrink-0 snap-start rounded-[8px] border border-line bg-surface object-contain sm:h-96" />
             ))}
           </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {shots.map((s, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={s.id} src={s.url!} alt={`${p.name} screenshot ${i + 1}`} loading="lazy" decoding="async" className="w-full rounded-[4px] border border-line bg-surface object-contain" />
+              <img key={s.id} src={s.url!} alt={`${p.name} screenshot ${i + 1}`} loading="lazy" decoding="async" className="lit w-full rounded-[4px] border border-line bg-surface object-contain" />
             ))}
           </div>
         )}
@@ -167,7 +167,7 @@ export default async function ProjectPage({ params }: Props) {
         {!apk && hero && (
           <div className="card card-major overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={hero} alt={`${p.name} cover`} className="max-h-[70vh] w-full object-cover" fetchPriority="high" />
+            <img src={hero} alt={`${p.name} cover`} className="lit max-h-[70vh] w-full object-cover" fetchPriority="high" />
           </div>
         )}
 
