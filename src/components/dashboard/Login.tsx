@@ -1,4 +1,5 @@
 "use client";
+import Logo from "@/components/site/Logo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -62,7 +63,7 @@ export default function Login({ state, email, notice }: { state: State; email?: 
   return (
     <main className="flex min-h-dvh items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
-        <Link href="/" className="font-display text-xl">Ghost<span className="text-accent"> Hub</span></Link>
+        <Logo size="text-xl" />
         <p className="mt-1 text-xs uppercase tracking-[0.18em] text-faint">Creator dashboard</p>
 
         <div className="card card-major mt-6 p-5 sm:p-6">

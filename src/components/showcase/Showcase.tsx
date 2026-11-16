@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ShowcaseData, ShowcaseProject } from "@/lib/showcase";
-import { KIND_ACTION, KIND_LABEL, kindOf, tileHref } from "@/lib/kind";
+import { KIND_ACTION, KIND_LABEL, categoryColor, kindOf, tileHref } from "@/lib/kind";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import { cx } from "@/lib/utils";
@@ -38,40 +38,54 @@ function Tile({ p, big, index }: { p: ShowcaseProject; big?: boolean; index: num
   const kind = kindOf(p);
   const href = tileHref(p);
   const hasDetails = href !== `/p/${p.slug}`;
+  const tint = categoryColor(p.category);
+  const isNew = Date.now() - +new Date(p.created_on) < 14 * 86400000;
   const reduce = useRef(false);
   useEffect(() => { reduce.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches; }, []);
   const on = () => { if (!reduce.current) setActive(true); };
   const off = () => setActive(false);
+  const spot = (e: React.PointerEvent<HTMLElement>) => {
+    if (e.pointerType !== "mouse") return;
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
+  };
 
   return (
     <article
       className={cx(
-        "rise group relative aspect-square overflow-hidden rounded-[4px] border border-line bg-surface transition duration-200 hover:z-10 hover:border-accent hover:shadow-lg focus-within:z-10 focus-within:border-accent",
-        big && "sm:col-span-2 sm:row-span-2 border-accent/50",
+        "rise tile group relative aspect-square overflow-hidden rounded-2xl border border-line bg-surface",
+        big && "sm:col-span-2 sm:row-span-2",
       )}
-      style={{ animationDelay: `${Math.min(index, 12) * 35}ms` }}
+      style={{ animationDelay: `${Math.min(index, 12) * 40}ms`, ["--tint" as string]: tint }}
       onPointerEnter={(e) => { if (e.pointerType === "mouse") on(); }}
+      onPointerMove={spot}
       onPointerLeave={off}
       onFocus={on}
       onBlur={off}
     >
-      <div className="absolute inset-0">
+      <div className="tile-art absolute inset-0">
         {p.thumb ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={p.thumb} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(120%_120%_at_20%_10%,#1d2a44,#0e1116)]">
-            <span className="font-display text-5xl text-accent/70">{initials(p.name)}</span>
+          <div className="flex h-full w-full items-center justify-center" style={{ background: `radial-gradient(120% 120% at 20% 8%, color-mix(in srgb, ${tint} 55%, #0b0c10), #0b0c10 75%)` }}>
+            <span className="font-display text-5xl text-white/85 sm:text-6xl">{initials(p.name)}</span>
           </div>
         )}
         {active && <Preview p={p} />}
       </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent p-3 pt-12">
-        <h3 className={cx("font-display leading-tight text-text", big ? "text-xl sm:text-3xl" : "text-sm sm:text-base")}>{p.name}</h3>
-        <p className="mt-0.5 truncate text-[11px] text-muted">{p.category}</p>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/55 to-transparent p-3.5 pt-14 sm:p-4 sm:pt-16">
+        <h3 className={cx("font-display leading-tight text-white", big ? "text-2xl sm:text-4xl" : "text-[15px] sm:text-lg")}>{p.name}</h3>
+        <p className="mt-1 flex items-center gap-1.5 truncate text-[11px] text-white/70">
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: tint }} aria-hidden="true" />{p.category}
+        </p>
       </div>
-      <span className="pointer-events-none absolute left-2 top-2 rounded-[2px] border border-line bg-ink/80 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.12em] text-muted">{KIND_LABEL[kind]}</span>
-      <span className={cx("pointer-events-none absolute bottom-3 right-3 rounded-[3px] bg-accent px-2.5 py-1 text-[11px] font-medium text-accent-ink transition-opacity", "opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100")}>{KIND_ACTION[kind]}</span>
+      <span className="pointer-events-none absolute left-2.5 top-2.5 flex items-center gap-1.5">
+        <span className="rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-white backdrop-blur-md">{KIND_LABEL[kind]}</span>
+        {isNew && <span className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-black" style={{ background: tint }}>New</span>}
+      </span>
+      <span className="pointer-events-none absolute bottom-3.5 right-3.5 rounded-full bg-white px-3 py-1.5 text-[11px] font-bold text-black opacity-100 shadow-lg transition duration-200 sm:translate-y-1 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100 sm:group-focus-within:translate-y-0 sm:group-focus-within:opacity-100">{KIND_ACTION[kind]}</span>
       {href.startsWith("/go/") ? (
         // Plain anchor: this is a server redirect to another site, not an app route, so it must not be prefetched or client-routed.
         <a href={href} className="absolute inset-0 z-10" aria-label={`${KIND_ACTION[kind].replace(/ .$/, "")} ${p.name}`}><span className="sr-only">{p.name}</span></a>
@@ -79,7 +93,7 @@ function Tile({ p, big, index }: { p: ShowcaseProject; big?: boolean; index: num
         <Link href={href} prefetch={false} className="absolute inset-0 z-10" aria-label={`${KIND_ACTION[kind].replace(/ .$/, "")} ${p.name}`}><span className="sr-only">{p.name}</span></Link>
       )}
       {hasDetails && (
-        <Link href={`/p/${p.slug}`} prefetch={false} className="absolute right-2 top-2 z-20 rounded-[2px] border border-line bg-ink/80 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.12em] text-muted hover:text-text focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">Details</Link>
+        <Link href={`/p/${p.slug}`} prefetch={false} className="absolute right-2.5 top-2.5 z-20 rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-white backdrop-blur-md hover:bg-black/75 focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">Details</Link>
       )}
     </article>
   );
@@ -125,11 +139,54 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
   const bigIds = useMemo(() => new Set(filtersActive ? [] : filtered.filter((p) => p.is_featured).slice(0, 2).map((p) => p.id)), [filtered, filtersActive]);
   const name = profile?.display_name ?? "Ghost Hub";
 
+  const kindCounts = useMemo(() => {
+    const c = { game: 0, app: 0, website: 0, project: 0 };
+    projects.forEach((p) => { c[kindOf(p)]++; });
+    return c;
+  }, [projects]);
+  const stats = [
+    { n: projects.length, label: projects.length === 1 ? "creation" : "creations" },
+    { n: kindCounts.game, label: kindCounts.game === 1 ? "game" : "games" },
+    { n: kindCounts.app, label: kindCounts.app === 1 ? "Android app" : "Android apps" },
+    { n: kindCounts.website, label: kindCounts.website === 1 ? "website" : "websites" },
+  ].filter((x) => x.n > 0);
+  const searchRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (e.key === "/" && !e.metaKey && !e.ctrlKey && t && !/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) && !t.isContentEditable) { e.preventDefault(); searchRef.current?.focus(); }
+    };
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, []);
+  const headline = profile?.headline?.trim();
+
   return (
     <div className="min-h-dvh">
-      <SiteHeader />
+      <SiteHeader wide />
       <main id="main">
-        <h1 className="sr-only">Ghost Hub: games, apps and websites</h1>
+        <section className="relative isolate overflow-hidden border-b border-line/60" aria-label="Introduction">
+          <div className="aurora" aria-hidden="true" />
+          <div className="mx-auto max-w-[1500px] px-4 pb-6 pt-7 sm:px-6 sm:pb-8 sm:pt-10">
+            <p className="rise inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 px-3 py-1 text-xs font-medium text-muted backdrop-blur">
+              <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34d399] opacity-60" /><span className="relative inline-flex h-2 w-2 rounded-full bg-[#34d399]" /></span>
+              Live &middot; hover a tile to preview
+            </p>
+            <h1 className="rise mt-3 max-w-4xl font-display text-[2rem] font-bold leading-[1.04] tracking-tight sm:text-5xl lg:text-[3.4rem]" style={{ animationDelay: "60ms" }}>
+              {headline ? headline : <>Games, apps &amp; <span className="grad-text">experiments</span>, all in one place.</>}
+            </h1>
+            <div className="rise mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" style={{ animationDelay: "120ms" }}>
+              <p className="max-w-xl text-[15px] leading-relaxed text-muted sm:text-base">Play in the browser, install on Android, or visit the live sites. Made by {name}.</p>
+              {stats.length > 0 && (
+                <dl className="flex flex-wrap gap-x-6 gap-y-2">
+                  {stats.map((x) => (
+                    <div key={x.label} className="flex items-baseline gap-1.5"><dd className="font-display text-2xl font-bold tabular-nums">{x.n}</dd><dt className="text-sm text-muted">{x.label}</dt></div>
+                  ))}
+                </dl>
+              )}
+            </div>
+          </div>
+        </section>
 
         {!data.configured ? (
           <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6"><div className="card p-6 sm:p-8">
@@ -140,10 +197,15 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
           <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6"><p className="card p-6 text-sm text-muted" role="alert">{data.error}</p></section>
         ) : (
           <>
-            <div id="work" className="sticky top-14 z-10 scroll-mt-14 border-b border-line bg-ink/90 backdrop-blur">
+            <div id="work" className="sticky top-14 z-10 scroll-mt-14 border-b border-line/70 bg-ink/80 backdrop-blur-xl">
               <div className="mx-auto max-w-[1500px] space-y-3 px-4 py-3 sm:px-6">
                 <div className="flex flex-col gap-2 sm:flex-row">
-                  <div className="sm:flex-1"><input className="field" type="search" placeholder="Search games, apps and websites…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search" /></div>
+                  <div className="relative sm:flex-1">
+                    <svg viewBox="0 0 24 24" className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-faint" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+                    <input ref={searchRef} className="field !rounded-full pl-11 pr-14" type="search" placeholder="Search games, apps and websites…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search" />
+                    {!q && <kbd className="kbd pointer-events-none absolute right-3.5 top-1/2 hidden -translate-y-1/2 sm:block" aria-hidden="true">/</kbd>}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 sm:contents">
                   <select className="field sm:w-44" value={tech} onChange={(e) => setTech(e.target.value)} aria-label="Filter by technology">
                     <option value="">All technologies</option>
                     {techs.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -154,20 +216,21 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
                     <option value="oldest">Oldest first</option>
                     <option value="name">Name A–Z</option>
                   </select>
+                  </div>
                 </div>
                 <div className="scrollbar-none -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0" role="group" aria-label="Categories">
-                  <button className="chip" aria-pressed={cat === "All"} onClick={() => setCat("All")}>All <span className="ml-1.5 text-faint">{projects.length}</span></button>
-                  {categories.map(([c, n]) => <button key={c} className="chip" aria-pressed={cat === c} onClick={() => setCat(c)}>{c} <span className="ml-1.5 text-faint">{n}</span></button>)}
-                  {filtersActive && <button className="chip border-accent/50 text-accent" onClick={reset}>Reset filters</button>}
+                  <button className="chip" aria-pressed={cat === "All"} onClick={() => setCat("All")}>All <span className="text-faint">{projects.length}</span></button>
+                  {categories.map(([c, n]) => <button key={c} className="chip" style={{ ["--tint" as string]: categoryColor(c) }} aria-pressed={cat === c} onClick={() => setCat(c)}>{c} <span className="text-faint">{n}</span></button>)}
+                  {filtersActive && <button className="chip !text-accent" onClick={reset}>Reset filters</button>}
                 </div>
               </div>
             </div>
 
-            <section className="mx-auto max-w-[1500px] px-4 pb-20 pt-5 sm:px-6" aria-label="Creations">
+            <section className="mx-auto max-w-[1500px] px-4 pb-20 pt-6 sm:px-6" aria-label="Creations">
               {projects.length === 0 ? (
-                <div className="card p-10 text-center"><p className="font-display text-2xl">Nothing is published yet.</p><p className="mt-2 text-sm text-muted">New games, apps and websites will appear here as soon as they are published.</p></div>
+                <div className="card p-12 text-center"><p className="font-display text-2xl">Nothing is published yet.</p><p className="mt-2 text-sm text-muted">New games, apps and websites will appear here as soon as they are published.</p></div>
               ) : filtered.length === 0 ? (
-                <div className="card p-10 text-center"><p className="font-display text-2xl">No matches.</p><p className="mt-1 text-sm text-muted">Nothing matches that. Try fewer words or reset the filters.</p><button className="btn btn-ghost btn-sm mt-4" onClick={reset}>Reset filters</button></div>
+                <div className="card p-12 text-center"><p className="font-display text-2xl">No matches.</p><p className="mt-1 text-sm text-muted">Nothing matches that. Try fewer words or reset the filters.</p><button className="btn btn-ghost btn-sm mt-4" onClick={reset}>Reset filters</button></div>
               ) : (
                 <>
                   <p className="sr-only" aria-live="polite">{filtered.length} {filtered.length === 1 ? "result" : "results"}</p>
@@ -180,7 +243,7 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
           </>
         )}
       </main>
-      <SiteFooter owner={name} />
+      <SiteFooter owner={name} wide />
     </div>
   );
 }

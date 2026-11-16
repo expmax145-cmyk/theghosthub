@@ -12,13 +12,18 @@ export const metadata: Metadata = {
   openGraph: { type: "website", siteName: "Ghost Hub", title: "Ghost Hub", description: DESCRIPTION, url: "/" },
   twitter: { card: "summary_large_image", title: "Ghost Hub", description: DESCRIPTION },
 };
-export const viewport: Viewport = { themeColor: "#0e1116", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#0b0c10", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Apply the saved (or system) theme before first paint so there is no flash. */}
+        <script dangerouslySetInnerHTML={{ __html: 'try{var t=localStorage.getItem("ghosthub-theme");if(!t)t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelector(\'meta[name="theme-color"]\');if(m)m.setAttribute("content",t==="dark"?"#0b0c10":"#f5f6fa")}catch(e){}' }} />
+      </head>
       <body>
-        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[200] focus:rounded-[3px] focus:bg-accent focus:px-4 focus:py-2 focus:text-accent-ink">Skip to content</a>
+        <div className="progress" aria-hidden="true" />
+        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[200] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-accent-ink">Skip to content</a>
         {children}
       </body>
     </html>

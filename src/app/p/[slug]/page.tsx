@@ -5,7 +5,7 @@ import { loadShowcase } from "@/lib/showcase";
 import { SITE } from "@/lib/site";
 import { STATUS_LABEL } from "@/lib/types";
 import { formatBytes, formatDate, safeUrl } from "@/lib/utils";
-import { kindOf, latestApk } from "@/lib/kind";
+import { categoryColor, kindOf, latestApk } from "@/lib/kind";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const H = "text-xs uppercase tracking-[0.14em] text-faint";
+const H = "text-xs font-semibold uppercase tracking-[0.16em] text-faint";
 
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
@@ -87,14 +87,14 @@ export default async function ProjectPage({ params }: Props) {
           <div className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:px-0" tabIndex={0} aria-label="Screenshots, scroll sideways">
             {shots.map((s, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={s.id} src={s.url!} alt={`${p.name} screenshot ${i + 1}`} loading={i < 2 ? "eager" : "lazy"} decoding="async" className="h-72 w-auto shrink-0 snap-start rounded-[8px] border border-line bg-surface object-contain sm:h-96" />
+              <img key={s.id} src={s.url!} alt={`${p.name} screenshot ${i + 1}`} loading={i < 2 ? "eager" : "lazy"} decoding="async" className="h-72 w-auto shrink-0 snap-start rounded-2xl border border-line bg-surface object-contain sm:h-96" />
             ))}
           </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {shots.map((s, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={s.id} src={s.url!} alt={`${p.name} screenshot ${i + 1}`} loading="lazy" decoding="async" className="w-full rounded-[4px] border border-line bg-surface object-contain" />
+              <img key={s.id} src={s.url!} alt={`${p.name} screenshot ${i + 1}`} loading="lazy" decoding="async" className="w-full rounded-xl border border-line bg-surface object-contain" />
             ))}
           </div>
         )}
@@ -103,7 +103,15 @@ export default async function ProjectPage({ params }: Props) {
   );
 
   return (
-    <div className="min-h-dvh">
+    <div className="relative isolate min-h-dvh">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px] overflow-hidden" aria-hidden="true" style={{ maskImage: "linear-gradient(to bottom, #000 40%, transparent)" }}>
+        {hero ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={hero} alt="" className="h-full w-full backdrop-art scale-125 object-cover blur-3xl saturate-150" />
+        ) : (
+          <div className="h-full w-full opacity-40" style={{ background: `radial-gradient(60% 80% at 30% 0%, ${categoryColor(p.category)}, transparent)` }} />
+        )}
+      </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld).replace(/</g, "\\u003c") }} />
       <SiteHeader />
       <main id="main" className="mx-auto max-w-4xl space-y-10 px-4 pb-24 pt-8 sm:px-6 sm:pt-12">
@@ -119,7 +127,7 @@ export default async function ProjectPage({ params }: Props) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={p.thumb} alt={`${p.name} icon`} className="h-full w-full object-cover" fetchPriority="high" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(120%_120%_at_20%_10%,#1d2a44,#0e1116)] font-display text-4xl text-accent/80">{p.name.slice(0, 2).toUpperCase()}</div>
+                <div style={{ background: `radial-gradient(120% 120% at 20% 8%, color-mix(in srgb, ${categoryColor(p.category)} 55%, #0b0c10), #0b0c10 75%)` }} className="flex h-full w-full items-center justify-center font-display text-4xl text-white/90">{p.name.slice(0, 2).toUpperCase()}</div>
               )}
             </div>
             <div className="min-w-0 flex-1 space-y-4">
@@ -202,7 +210,7 @@ export default async function ProjectPage({ params }: Props) {
         {!apk && gallery}
 
         {p.videos.filter((v) => v.url).map((v) => (
-          <video key={v.id} src={v.url!} controls preload="metadata" playsInline className="w-full rounded-[4px] border border-line bg-black" />
+          <video key={v.id} src={v.url!} controls preload="metadata" playsInline className="w-full rounded-xl border border-line bg-black" />
         ))}
 
         {apk && (
