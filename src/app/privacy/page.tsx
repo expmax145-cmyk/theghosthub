@@ -11,7 +11,7 @@ export default function Privacy() {
       <h2 className="font-display text-2xl">What visitors share</h2>
       <p>There are no visitor accounts, no tracking cookies, no advertising and no analytics scripts on this site. Browsing the showcase does not ask you for any personal information.</p>
       <h2 className="font-display text-2xl">What is stored in your browser</h2>
-      <p>A small note in your browser&rsquo;s local storage remembers that you have already seen the intro animation, so it is not shown on every visit. It never leaves your device and you can clear it at any time.</p>
+      <p>This site does not store anything about your visit in your browser, apart from what is needed to keep the owner signed in on the creator dashboard.</p>
       <h2 className="font-display text-2xl">Server logs</h2>
       <p>The hosting provider (Vercel) and the database provider (Supabase) keep standard technical logs, such as IP address and request time, for security and operation of the service. Those logs are governed by their own privacy policies.</p>
       <h2 className="font-display text-2xl">Downloads and external links</h2>

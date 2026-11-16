@@ -87,14 +87,14 @@ export default async function ProjectPage({ params }: Props) {
           <div className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:px-0" tabIndex={0} aria-label="Screenshots, scroll sideways">
             {shots.map((s, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={s.id} src={s.url!} alt={`${p.name} screenshot ${i + 1}`} loading={i < 2 ? "eager" : "lazy"} decoding="async" className="lit h-72 w-auto shrink-0 snap-start rounded-[8px] border border-line bg-surface object-contain sm:h-96" />
+              <img key={s.id} src={s.url!} alt={`${p.name} screenshot ${i + 1}`} loading={i < 2 ? "eager" : "lazy"} decoding="async" className="h-72 w-auto shrink-0 snap-start rounded-[8px] border border-line bg-surface object-contain sm:h-96" />
             ))}
           </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {shots.map((s, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={s.id} src={s.url!} alt={`${p.name} screenshot ${i + 1}`} loading="lazy" decoding="async" className="lit w-full rounded-[4px] border border-line bg-surface object-contain" />
+              <img key={s.id} src={s.url!} alt={`${p.name} screenshot ${i + 1}`} loading="lazy" decoding="async" className="w-full rounded-[4px] border border-line bg-surface object-contain" />
             ))}
           </div>
         )}
@@ -114,12 +114,12 @@ export default async function ProjectPage({ params }: Props) {
 
         {apk ? (
           <header className="flex flex-col gap-6 sm:flex-row sm:items-start">
-            <div className="h-28 w-28 shrink-0 overflow-hidden rounded-[22px] border border-accent/50 bg-surface shadow-[0_0_30px_rgba(224,33,44,0.2)] sm:h-36 sm:w-36">
+            <div className="h-28 w-28 shrink-0 overflow-hidden rounded-[22px] border border-accent/50 bg-surface shadow-lg sm:h-36 sm:w-36">
               {p.thumb ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={p.thumb} alt={`${p.name} icon`} className="h-full w-full object-cover" fetchPriority="high" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(120%_120%_at_20%_10%,#1a0508,#050509)] font-display text-4xl text-accent/80">{p.name.slice(0, 2).toUpperCase()}</div>
+                <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(120%_120%_at_20%_10%,#1d2a44,#0e1116)] font-display text-4xl text-accent/80">{p.name.slice(0, 2).toUpperCase()}</div>
               )}
             </div>
             <div className="min-w-0 flex-1 space-y-4">
@@ -167,7 +167,7 @@ export default async function ProjectPage({ params }: Props) {
         {!apk && hero && (
           <div className="card card-major overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={hero} alt={`${p.name} cover`} className="lit max-h-[70vh] w-full object-cover" fetchPriority="high" />
+            <img src={hero} alt={`${p.name} cover`} className="max-h-[70vh] w-full object-cover" fetchPriority="high" />
           </div>
         )}
 

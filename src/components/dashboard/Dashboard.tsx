@@ -81,7 +81,7 @@ export default function Dashboard({ data, loadError }: { data: DashboardData; lo
     <div className="min-h-dvh">
       <header className="sticky top-0 z-30 border-b border-accent/40 bg-ink/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
-          <Link href="/studio" className="shrink-0 font-display text-lg"><span className="eyes" aria-hidden="true"><i /><i /></span>Ghost<span className="text-accent"> Hub</span><span className="ml-2 hidden text-xs uppercase tracking-[0.16em] text-faint sm:inline">Creator dashboard</span></Link>
+          <Link href="/studio" className="shrink-0 font-display text-lg">Ghost<span className="text-accent"> Hub</span><span className="ml-2 hidden text-xs uppercase tracking-[0.16em] text-faint sm:inline">Creator dashboard</span></Link>
           <input className="field mx-auto min-h-9 max-w-md flex-1 py-0" type="search" placeholder={tab === "files" ? "Search files…" : "Search projects…"} value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search" />
           <div className="hidden w-32 shrink-0 text-[11px] text-faint md:block" title={`${formatBytes(used)} of ${formatBytes(STORAGE_QUOTA_BYTES)} used`}>
             <div className="mb-1 flex justify-between"><span>Storage</span><span>{pct}%</span></div>
