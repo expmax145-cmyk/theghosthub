@@ -131,7 +131,7 @@ export default function Intro() {
 
   if (gone) return null;
   return (
-    <div data-intro className={`fixed inset-0 z-[300] bg-ink transition-opacity duration-700 ${run ? "" : "opacity-0"}`} role="dialog" aria-label="Welcome animation" onClick={() => done.current()}>
+    <div data-intro className={`fixed inset-0 z-[300] bg-ink `} role="dialog" aria-label="Welcome animation" onClick={() => done.current()}>
       <canvas ref={cvs} className="absolute inset-0 h-full w-full" aria-hidden="true" />
       <button type="button" onClick={(e) => { e.stopPropagation(); done.current(); }} className="btn btn-ghost btn-sm absolute bottom-6 right-5">Skip</button>
     </div>
