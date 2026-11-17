@@ -113,6 +113,7 @@ export default async function ProjectPage({ params }: Props) {
         )}
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld).replace(/</g, "\\u003c") }} />
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-30 h-[3px]" aria-hidden="true" style={{ background: `linear-gradient(90deg, transparent, ${categoryColor(p.category)}, transparent)` }} />
       <SiteHeader />
       <main id="main" className="mx-auto max-w-4xl space-y-10 px-4 pb-24 pt-8 sm:px-6 sm:pt-12">
         <nav aria-label="Breadcrumb" className="text-xs text-faint">

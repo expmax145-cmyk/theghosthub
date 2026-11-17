@@ -204,3 +204,12 @@ html:not(.js) [data-intro], html[data-intro-seen] [data-intro] { display: none !
 .palette-in { animation: palette-in 0.18s ease-out both; }
 @keyframes palette-in { from { opacity: 0; translate: 0 -8px; scale: 0.98; } to { opacity: 1; translate: 0 0; scale: 1; } }
 @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } .wisp-float, .wisp-blink { animation: none; } }
+
+/* v3 */
+.page-in { animation: page-in 0.35s ease-out both; }
+@keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
+.party-ghost { position: fixed; top: -40px; z-index: 320; pointer-events: none; animation: party-fall var(--t, 3s) linear forwards; }
+@keyframes party-fall { to { transform: translateY(110vh) rotate(var(--r, 360deg)); opacity: 0.9; } }
+.wisp-spin { animation: wisp-spin 0.9s ease-in-out; }
+@keyframes wisp-spin { to { transform: rotate(360deg) scale(1.15); } }
+@media (prefers-reduced-motion: reduce) { .page-in, .party-ghost, .wisp-spin { animation: none; } .party-ghost { display: none; } }

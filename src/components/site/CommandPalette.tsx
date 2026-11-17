@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { usePaletteProjects } from "@/lib/palette";
+import { goTo, surpriseHref, usePaletteProjects } from "@/lib/palette";
 import { applyTheme, currentTheme } from "@/lib/theme";
 import { categoryColor } from "@/lib/kind";
 
@@ -41,6 +41,8 @@ export default function CommandPalette() {
       { id: "about", label: "About", hint: "Who made this", group: "Go to", run: () => go("/about") },
       { id: "contact", label: "Contact", hint: "Say hello", group: "Go to", run: () => go("/contact") },
       { id: "studio", label: "Creator sign in", hint: "Studio", group: "Go to", run: () => go("/studio") },
+      { id: "surprise", label: "Surprise me", hint: "Open a random creation", group: "Actions", run: () => { const h = surpriseHref(); setOpen(false); if (h) goTo(h); } },
+      { id: "party", label: "Wisp party", hint: "Try ↑ ↑ ↓ ↓ ← → ← → B A", group: "Actions", run: () => { setOpen(false); setTimeout(() => window.dispatchEvent(new Event("ghosthub:party")), 150); } },
       { id: "theme", label: "Toggle light / dark theme", hint: "Appearance", group: "Actions", run: () => { applyTheme(currentTheme() === "dark" ? "light" : "dark"); setOpen(false); } },
       { id: "intro", label: "Replay intro animation", hint: "Wisp says hi", group: "Actions", run: () => { setOpen(false); try { sessionStorage.removeItem("ghosthub-intro-v2"); } catch { /* blocked */ } if (location.pathname === "/") window.dispatchEvent(new Event("ghosthub:intro")); else location.assign("/"); } },
     ];

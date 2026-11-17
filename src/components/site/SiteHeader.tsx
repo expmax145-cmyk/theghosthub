@@ -3,6 +3,7 @@ import { NAV } from "@/lib/site";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import PaletteButton from "./PaletteButton";
+import SoundToggle from "./SoundToggle";
 
 export default function SiteHeader({ wide = false }: { wide?: boolean }) {
   return (
@@ -15,6 +16,7 @@ export default function SiteHeader({ wide = false }: { wide?: boolean }) {
             <span className="sm:hidden">Sign in</span><span className="hidden sm:inline">Creator sign in</span>
           </Link>
           <PaletteButton />
+          <SoundToggle />
           <ThemeToggle />
         </nav>
       </div>

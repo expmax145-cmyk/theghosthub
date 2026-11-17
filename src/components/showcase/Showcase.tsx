@@ -6,7 +6,7 @@ import { KIND_ACTION, KIND_LABEL, categoryColor, kindOf, tileHref } from "@/lib/
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import { cx } from "@/lib/utils";
-import { setPaletteProjects } from "@/lib/palette";
+import { goTo, setPaletteProjects, surpriseHref } from "@/lib/palette";
 import Intro from "./Intro";
 import Mascot from "./Mascot";
 import Constellation from "./Constellation";
@@ -164,6 +164,7 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
   }, [projects]);
   const [searchFocus, setSearchFocus] = useState(false);
   const say = q.trim() ? (filtered.length ? `Found ${filtered.length} for “${q.trim().slice(0, 24)}”` : `No “${q.trim().slice(0, 24)}” yet…`) : searchFocus ? "Type anything. I'll look." : undefined;
+  const latest = useMemo(() => [...projects].sort((a, b) => +new Date(b.created_on) - +new Date(a.created_on))[0], [projects]);
   const searchRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
@@ -193,7 +194,15 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
               {headline ? headline : <>Games, apps &amp; <span className="grad-text">experiments</span>, all in one place.</>}
             </h1>
             <div className="rise mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" style={{ animationDelay: "120ms" }}>
-              <p className="max-w-xl text-[15px] leading-relaxed text-muted sm:text-base">Play in the browser, install on Android, or visit the live sites. Made by {name}.</p>
+              <div className="max-w-xl">
+                <p className="text-[15px] leading-relaxed text-muted sm:text-base">Play in the browser, install on Android, or visit the live sites. Made by {name}.</p>
+                {projects.length > 0 && (
+                  <div className="mt-4 flex flex-wrap items-center gap-2.5">
+                    <button type="button" className="btn btn-primary btn-sm" onClick={() => { const h = surpriseHref(); if (h) goTo(h); }}>Surprise me ✦</button>
+                    {latest && <a href={tileHref(latest)} className="inline-flex max-w-full items-center gap-2 truncate rounded-full border border-line bg-surface/60 px-3 py-1.5 text-xs text-muted backdrop-blur hover:border-accent/50 hover:text-text"><span className="rounded-full bg-accent px-1.5 py-px text-[10px] font-bold uppercase text-accent-ink">Latest</span><span className="truncate">{latest.name}</span></a>}
+                  </div>
+                )}
+              </div>
               {stats.length > 0 && (
                 <dl className="flex flex-wrap gap-x-6 gap-y-2">
                   {stats.map((x) => (

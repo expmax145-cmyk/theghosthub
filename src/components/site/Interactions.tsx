@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { blip } from "@/lib/sound";
 
 /** Global behaviours with no markup: scroll reveals, button ripples + magnetic pull, smart header. */
 export default function Interactions() {
@@ -23,6 +24,7 @@ export default function Interactions() {
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const down = (e: PointerEvent) => {
+      if ((e.target as HTMLElement | null)?.closest(".btn, .chip, [role=option]")) blip(540, 0.05);
       if (reduce) return;
       const el = (e.target as HTMLElement | null)?.closest<HTMLElement>(".btn, .chip");
       if (!el || (el as HTMLButtonElement).disabled) return;
@@ -61,6 +63,19 @@ export default function Interactions() {
         ticking = false;
       });
     };
+    // Konami code: Wisp throws a party.
+    const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+    let pos = 0;
+    const konami = (e: KeyboardEvent) => {
+      const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      pos = k === code[pos] ? pos + 1 : k === code[0] ? 1 : 0;
+      if (pos === code.length) { pos = 0; window.dispatchEvent(new Event("ghosthub:party")); }
+    };
+    const hover = (e: PointerEvent) => { if (e.pointerType === "mouse" && (e.target as HTMLElement | null)?.closest?.("article.tile")) blip(780, 0.035, 0.025); };
+    let lastTile: Element | null = null;
+    const over = (e: PointerEvent) => { const t = (e.target as HTMLElement | null)?.closest?.("article.tile") ?? null; if (t && t !== lastTile) hover(e); lastTile = t; };
+    window.addEventListener("keydown", konami);
+    document.addEventListener("pointerover", over, { passive: true });
     document.addEventListener("pointerdown", down, { passive: true });
     document.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("scroll", scroll, { passive: true });
@@ -68,6 +83,8 @@ export default function Interactions() {
       document.removeEventListener("pointerdown", down);
       document.removeEventListener("pointermove", move);
       window.removeEventListener("scroll", scroll);
+      window.removeEventListener("keydown", konami);
+      document.removeEventListener("pointerover", over);
       html.removeAttribute("data-header");
     };
   }, []);

@@ -14,3 +14,9 @@ export function usePaletteProjects(): PaletteProject[] {
   return useSyncExternalStore((cb) => { subs.add(cb); return () => { subs.delete(cb); }; }, () => items, () => items);
 }
 export const openPalette = () => window.dispatchEvent(new Event("ghosthub:palette"));
+
+/** A random creation's link (null when nothing is published). */
+export function surpriseHref(): string | null {
+  return items.length ? items[Math.floor(Math.random() * items.length)].href : null;
+}
+export const goTo = (href: string) => { location.assign(href); };
