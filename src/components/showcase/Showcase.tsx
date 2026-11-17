@@ -6,6 +6,11 @@ import { KIND_ACTION, KIND_LABEL, categoryColor, kindOf, tileHref } from "@/lib/
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import { cx } from "@/lib/utils";
+import { setPaletteProjects } from "@/lib/palette";
+import Intro from "./Intro";
+import Mascot from "./Mascot";
+import Constellation from "./Constellation";
+import ComingSoon from "./ComingSoon";
 
 type Sort = "recent" | "newest" | "oldest" | "name";
 
@@ -49,7 +54,10 @@ function Tile({ p, big, index }: { p: ShowcaseProject; big?: boolean; index: num
     const r = e.currentTarget.getBoundingClientRect();
     e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
     e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
+    e.currentTarget.style.setProperty("--ry", `${((e.clientX - r.left) / r.width - 0.5) * 7}deg`);
+    e.currentTarget.style.setProperty("--rx", `${(0.5 - (e.clientY - r.top) / r.height) * 7}deg`);
   };
+  const flat = (e: React.PointerEvent<HTMLElement>) => { e.currentTarget.style.setProperty("--rx", "0deg"); e.currentTarget.style.setProperty("--ry", "0deg"); };
 
   return (
     <article
@@ -60,7 +68,7 @@ function Tile({ p, big, index }: { p: ShowcaseProject; big?: boolean; index: num
       style={{ animationDelay: `${Math.min(index, 12) * 40}ms`, ["--tint" as string]: tint }}
       onPointerEnter={(e) => { if (e.pointerType === "mouse") on(); }}
       onPointerMove={spot}
-      onPointerLeave={off}
+      onPointerLeave={(e) => { off(); flat(e); }}
       onFocus={on}
       onBlur={off}
     >
@@ -150,6 +158,12 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
     { n: kindCounts.app, label: kindCounts.app === 1 ? "Android app" : "Android apps" },
     { n: kindCounts.website, label: kindCounts.website === 1 ? "website" : "websites" },
   ].filter((x) => x.n > 0);
+  useEffect(() => {
+    setPaletteProjects(projects.map((p) => ({ name: p.name, category: p.category, href: tileHref(p), hint: `${KIND_LABEL[kindOf(p)]} · ${p.category}` })));
+    return () => setPaletteProjects([]);
+  }, [projects]);
+  const [searchFocus, setSearchFocus] = useState(false);
+  const say = q.trim() ? (filtered.length ? `Found ${filtered.length} for “${q.trim().slice(0, 24)}”` : `No “${q.trim().slice(0, 24)}” yet…`) : searchFocus ? "Type anything. I'll look." : undefined;
   const searchRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
@@ -163,14 +177,17 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
 
   return (
     <div className="min-h-dvh">
+      <Intro />
       <SiteHeader wide />
       <main id="main">
         <section className="relative isolate overflow-hidden border-b border-line/60" aria-label="Introduction">
           <div className="aurora" aria-hidden="true" />
-          <div className="mx-auto max-w-[1500px] px-4 pb-6 pt-7 sm:px-6 sm:pb-8 sm:pt-10">
+          <Constellation />
+          <div className="relative mx-auto max-w-[1500px] px-4 pb-6 pt-7 sm:px-6 sm:pb-8 sm:pt-10">
+            <Mascot say={say} className="absolute right-4 top-3 z-10 h-16 w-14 sm:right-10 sm:top-8 sm:h-44 sm:w-40 lg:right-16 lg:h-52 lg:w-48" />
             <p className="rise inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 px-3 py-1 text-xs font-medium text-muted backdrop-blur">
               <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34d399] opacity-60" /><span className="relative inline-flex h-2 w-2 rounded-full bg-[#34d399]" /></span>
-              Live &middot; hover a tile to preview
+              Live &middot; hover a tile to preview<span className="hidden sm:contents"> &middot; press <kbd className="kbd">Ctrl K</kbd></span>
             </p>
             <h1 className="rise mt-3 max-w-4xl font-display text-[2rem] font-bold leading-[1.04] tracking-tight sm:text-5xl lg:text-[3.4rem]" style={{ animationDelay: "60ms" }}>
               {headline ? headline : <>Games, apps &amp; <span className="grad-text">experiments</span>, all in one place.</>}
@@ -188,6 +205,18 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
           </div>
         </section>
 
+        <div className="border-b border-line/60 py-3" aria-label="What lives here">
+          <div className="marquee">
+            {[0, 1].map((k) => (
+              <ul key={k} className="marquee-track" aria-hidden={k === 1}>
+                {(categories.length ? categories.map(([c]) => c) : ["Games", "Android apps", "Websites", "AI experiments", "Prototypes"]).concat(["Play", "Install", "Visit", "Explore"]).map((t) => (
+                  <li key={t} className="chip pointer-events-none" style={{ ["--tint" as string]: categoryColor(t) }}>{t}</li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        </div>
+
         {!data.configured ? (
           <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6"><div className="card p-6 sm:p-8">
             <h2 className="font-display text-2xl">Setup needed</h2>
@@ -197,12 +226,12 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
           <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6"><p className="card p-6 text-sm text-muted" role="alert">{data.error}</p></section>
         ) : (
           <>
-            <div id="work" className="sticky top-14 z-10 scroll-mt-14 border-b border-line/70 bg-ink/80 backdrop-blur-xl">
+            <div id={projects.length ? "work" : undefined} className={cx("under-header sticky z-10 scroll-mt-14 border-b border-line/70 bg-ink/80 backdrop-blur-xl", projects.length === 0 && "hidden")}>
               <div className="mx-auto max-w-[1500px] space-y-3 px-4 py-3 sm:px-6">
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <div className="relative sm:flex-1">
                     <svg viewBox="0 0 24 24" className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-faint" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-                    <input ref={searchRef} className="field !rounded-full pl-11 pr-14" type="search" placeholder="Search games, apps and websites…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search" />
+                    <input ref={searchRef} className="field !rounded-full pl-11 pr-14" onFocus={() => setSearchFocus(true)} onBlur={() => setSearchFocus(false)} type="search" placeholder="Search games, apps and websites…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search" />
                     {!q && <kbd className="kbd pointer-events-none absolute right-3.5 top-1/2 hidden -translate-y-1/2 sm:block" aria-hidden="true">/</kbd>}
                   </div>
                   <div className="grid grid-cols-2 gap-2 sm:contents">
@@ -228,7 +257,7 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
 
             <section className="mx-auto max-w-[1500px] px-4 pb-20 pt-6 sm:px-6" aria-label="Creations">
               {projects.length === 0 ? (
-                <div className="card p-12 text-center"><p className="font-display text-2xl">Nothing is published yet.</p><p className="mt-2 text-sm text-muted">New games, apps and websites will appear here as soon as they are published.</p></div>
+                <div id="work" className="scroll-mt-20"><ComingSoon /></div>
               ) : filtered.length === 0 ? (
                 <div className="card p-12 text-center"><p className="font-display text-2xl">No matches.</p><p className="mt-1 text-sm text-muted">Nothing matches that. Try fewer words or reset the filters.</p><button className="btn btn-ghost btn-sm mt-4" onClick={reset}>Reset filters</button></div>
               ) : (

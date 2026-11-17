@@ -95,7 +95,7 @@ body {
 
 /* ---------- Motion (all of it respects reduced-motion) ---------- */
 .rise { animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes rise { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }
 @media (prefers-reduced-motion: reduce) {
   .rise { animation: none; }
   html { scroll-behavior: auto; }
@@ -136,9 +136,9 @@ dialog { max-width: 100vw; max-height: 100dvh; }
 .nav-link:hover::after, .nav-link:focus-visible::after { transform: scaleX(1); }
 
 /* Tiles: lift, category-coloured glow, and a soft spotlight that follows the pointer. */
-.tile { --tint: var(--color-accent); transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.25s, border-color 0.25s; }
+.tile { --tint: var(--color-accent); transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.25s, border-color 0.25s; will-change: transform; }
 .tile:hover, .tile:focus-within {
-  transform: translateY(-4px);
+  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-4px);
   border-color: color-mix(in srgb, var(--tint) 70%, var(--color-line));
   box-shadow: 0 18px 44px -16px color-mix(in srgb, var(--tint) 60%, transparent);
 }
@@ -153,3 +153,50 @@ dialog { max-width: 100vw; max-height: 100dvh; }
 
 .backdrop-art { opacity: 0.3; }
 :root[data-theme="light"] .backdrop-art { opacity: 0.14; }
+
+/* ---------- v2: interactive layer ---------- */
+:root { --header-offset: 3.5rem; }
+.site-header { transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
+html[data-header="hidden"] { --header-offset: 0rem; }
+html[data-header="hidden"] .site-header { transform: translateY(-100%); }
+.under-header { top: var(--header-offset); transition: top 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
+
+/* Intro overlay: hidden for repeat visits, without JS, and for reduced motion (the head script sets the flags). */
+html:not(.js) [data-intro], html[data-intro-seen] [data-intro] { display: none !important; }
+
+/* Scroll reveal. Only hides things when JS is running, and never under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-reveal] { opacity: 0; translate: 0 22px; transition: opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1), translate 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); transition-delay: var(--d, 0ms); }
+  html.js [data-reveal].in { opacity: 1; translate: 0 0; }
+}
+
+/* Ripple + magnetic buttons. */
+.btn:where(:not(.absolute, .fixed, .sticky)), .chip:where(:not(.absolute, .fixed, .sticky)) { position: relative; }
+.btn, .chip { overflow: hidden; }
+.btn { translate: var(--tx, 0px) var(--ty, 0px); }
+.ripple { position: absolute; border-radius: 50%; pointer-events: none; background: currentColor; opacity: 0.22; transform: scale(0); animation: ripple 0.6s ease-out forwards; }
+@keyframes ripple { to { transform: scale(1); opacity: 0; } }
+
+/* Marquee strip. */
+.marquee { display: flex; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.marquee-track { display: flex; flex: none; gap: 0.75rem; padding-right: 0.75rem; animation: marquee 38s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+@keyframes marquee { to { transform: translateX(-100%); } }
+
+/* Mascot. */
+.wisp-float { animation: wisp-float 5s ease-in-out infinite; }
+@keyframes wisp-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+.wisp-blink { animation: wisp-blink 5.5s infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes wisp-blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(0.1); } }
+.bubble { animation: bubble-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.3) both; }
+@keyframes bubble-in { from { opacity: 0; scale: 0.8; } to { opacity: 1; scale: 1; } }
+
+/* Coming-soon doors. */
+.door { transform-style: preserve-3d; transition: transform 0.2s ease-out, border-color 0.25s, box-shadow 0.25s; transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); }
+.door:hover { border-color: color-mix(in srgb, var(--tint) 70%, var(--color-line)); box-shadow: 0 18px 44px -16px color-mix(in srgb, var(--tint) 60%, transparent); }
+.door-glow { background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 30%), color-mix(in srgb, var(--tint) 30%, transparent), transparent 70%); }
+
+/* Palette dialog. */
+.palette-in { animation: palette-in 0.18s ease-out both; }
+@keyframes palette-in { from { opacity: 0; translate: 0 -8px; scale: 0.98; } to { opacity: 1; translate: 0 0; scale: 1; } }
+@media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } .wisp-float, .wisp-blink { animation: none; } }

@@ -1,16 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
+import { applyTheme, currentTheme, type Theme } from "@/lib/theme";
 
 /** Dark/light switch. The inline script in the layout applies the saved choice before first paint. */
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-  useEffect(() => { setTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark"); }, []);
+  const [theme, setTheme] = useState<Theme>("dark");
+  useEffect(() => {
+    setTheme(currentTheme());
+    const on = (e: Event) => setTheme((e as CustomEvent<Theme>).detail);
+    window.addEventListener("ghosthub:theme", on);
+    return () => window.removeEventListener("ghosthub:theme", on);
+  }, []);
   const flip = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    document.documentElement.dataset.theme = next;
-    try { localStorage.setItem("ghosthub-theme", next); } catch { /* storage blocked */ }
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "dark" ? "#0b0c10" : "#f5f6fa");
+    applyTheme(theme === "dark" ? "light" : "dark");
   };
   return (
     <button type="button" onClick={flip} aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}

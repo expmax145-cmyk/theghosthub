@@ -26,7 +26,7 @@ const send = (res, code, body, type = "application/json") => { res.writeHead(cod
 http.createServer((req, res) => {
   const u = new URL(req.url, "http://x");
   if (req.method === "OPTIONS") return send(res, 204, "");
-  if (u.pathname === "/rest/v1/projects") return send(res, 200, projects);
+  if (u.pathname === "/rest/v1/projects") return send(res, 200, process.env.MOCK_EMPTY ? [] : projects);
   if (u.pathname === "/rest/v1/files") return send(res, 200, files);
   if (u.pathname === "/rest/v1/releases") return send(res, 200, releases);
   if (u.pathname === "/rest/v1/profiles") return send(res, 200, profiles);
