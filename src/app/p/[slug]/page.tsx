@@ -127,7 +127,7 @@ export default async function ProjectPage({ params }: Props) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={p.thumb} alt={`${p.name} icon`} className="h-full w-full object-cover" fetchPriority="high" />
               ) : (
-                <div style={{ background: `radial-gradient(120% 120% at 20% 8%, color-mix(in srgb, ${categoryColor(p.category)} 55%, #0b0c10), #0b0c10 75%)` }} className="flex h-full w-full items-center justify-center font-display text-4xl text-white/90">{p.name.slice(0, 2).toUpperCase()}</div>
+                <div style={{ background: `radial-gradient(120% 120% at 20% 8%, color-mix(in srgb, ${categoryColor(p.category)} 55%, #06101c), #06101c 75%)` }} className="flex h-full w-full items-center justify-center font-display text-4xl text-white/90">{p.name.slice(0, 2).toUpperCase()}</div>
               )}
             </div>
             <div className="min-w-0 flex-1 space-y-4">

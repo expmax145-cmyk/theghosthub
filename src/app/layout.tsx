@@ -15,14 +15,14 @@ export const metadata: Metadata = {
   openGraph: { type: "website", siteName: "Ghost Hub", title: "Ghost Hub", description: DESCRIPTION, url: "/" },
   twitter: { card: "summary_large_image", title: "Ghost Hub", description: DESCRIPTION },
 };
-export const viewport: Viewport = { themeColor: "#0b0c10", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#06101c", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Apply the saved (or system) theme before first paint so there is no flash. */}
-        <script dangerouslySetInnerHTML={{ __html: 'try{var d=document.documentElement;d.classList.add("js");if(sessionStorage.getItem("ghosthub-intro-v2")==="1"||matchMedia("(prefers-reduced-motion: reduce)").matches)d.setAttribute("data-intro-seen","1");var t=localStorage.getItem("ghosthub-theme");if(!t)t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";d.dataset.theme=t;var m=document.querySelector(\'meta[name="theme-color"]\');if(m)m.setAttribute("content",t==="dark"?"#0b0c10":"#f5f6fa")}catch(e){}' }} />
+        <script dangerouslySetInnerHTML={{ __html: 'try{var d=document.documentElement;d.classList.add("js");if(sessionStorage.getItem("ghosthub-intro-v2")==="1"||matchMedia("(prefers-reduced-motion: reduce)").matches)d.setAttribute("data-intro-seen","1");var t=localStorage.getItem("ghosthub-theme");if(!t)t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";d.dataset.theme=t;var m=document.querySelector(\'meta[name="theme-color"]\');if(m)m.setAttribute("content",t==="dark"?"#06101c":"#f0f7fd")}catch(e){}' }} />
       </head>
       <body>
         <div className="progress" aria-hidden="true" />

@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { GHOST_PATH } from "@/components/site/Logo";
 
 const SEEN = "ghosthub-intro-v2";
-const DARK = ["#a99cff", "#7aa8ff", "#5cc8ff", "#5eead4", "#c4b5fd"];
-const LIGHT = ["#5446e0", "#2563eb", "#0a76cc", "#0d9672", "#7c3aed"];
+const DARK = ["#7cb8ff", "#4da3ff", "#2dd4cf", "#4ade80", "#9bd0ff"];
+const LIGHT = ["#0b63d1", "#0a8a8f", "#138a52", "#2563eb", "#0c7f93"];
 
 type P = { x: number; y: number; sx: number; sy: number; tx: number; ty: number; a: number; r: number; c: string; vx: number; vy: number };
 

@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "A personal digital headquarters for apps, games, websites and experiments.",
     start_url: "/",
     display: "standalone",
-    background_color: "#0b0c10",
-    theme_color: "#0b0c10",
+    background_color: "#06101c",
+    theme_color: "#06101c",
     icons: [{ src: "/icon", sizes: "64x64", type: "image/png" }],
   };
 }

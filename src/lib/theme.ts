@@ -8,6 +8,6 @@ export function currentTheme(): Theme {
 export function applyTheme(next: Theme) {
   document.documentElement.dataset.theme = next;
   try { localStorage.setItem("ghosthub-theme", next); } catch { /* storage blocked */ }
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "dark" ? "#0b0c10" : "#f5f6fa");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "dark" ? "#06101c" : "#f0f7fd");
   window.dispatchEvent(new CustomEvent("ghosthub:theme", { detail: next }));
 }

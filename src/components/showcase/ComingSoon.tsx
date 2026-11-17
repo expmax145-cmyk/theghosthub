@@ -2,10 +2,10 @@
 import Link from "next/link";
 
 const DOORS = [
-  { label: "Games", note: "Play in your browser, no install.", tint: "#8f84ff", icon: <><rect x="3" y="8" width="18" height="10" rx="5" /><path d="M8 11v4M6 13h4M16 12h.01M18 14h.01" /></> },
-  { label: "Android apps", note: "Install straight from an APK.", tint: "#34d399", icon: <><rect x="7" y="2.5" width="10" height="19" rx="2.5" /><path d="M11 18.5h2" /></> },
-  { label: "Websites", note: "Live sites, one tap away.", tint: "#38bdf8", icon: <><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18" /></> },
-  { label: "Experiments", note: "AI toys and weird prototypes.", tint: "#fb7185", icon: <><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9V3" /><path d="M7.5 15h9" /></> },
+  { label: "Games", note: "Play in your browser, no install.", tint: "#4da3ff", icon: <><rect x="3" y="8" width="18" height="10" rx="5" /><path d="M8 11v4M6 13h4M16 12h.01M18 14h.01" /></> },
+  { label: "Android apps", note: "Install straight from an APK.", tint: "#4ade80", icon: <><rect x="7" y="2.5" width="10" height="19" rx="2.5" /><path d="M11 18.5h2" /></> },
+  { label: "Websites", note: "Live sites, one tap away.", tint: "#2dd4cf", icon: <><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18" /></> },
+  { label: "Experiments", note: "AI toys and weird prototypes.", tint: "#7cb8ff", icon: <><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9V3" /><path d="M7.5 15h9" /></> },
 ];
 
 /** Shown while nothing is published: four doors that tilt toward the pointer, "opening soon". */

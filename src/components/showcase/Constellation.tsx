@@ -12,7 +12,7 @@ export default function Constellation() {
     let w = 0, h = 0, raf = 0, visible = true, mx = -999, my = -999;
     type D = { x: number; y: number; vx: number; vy: number };
     let dots: D[] = [];
-    const color = () => getComputedStyle(document.documentElement).getPropertyValue("--glow-a").trim().replace(/\s+/g, ",") || "143,132,255";
+    const color = () => getComputedStyle(document.documentElement).getPropertyValue("--glow-a").trim().replace(/\s+/g, ",") || "59,142,246";
     let rgb = color();
     const size = () => {
       const r = c.getBoundingClientRect(); w = r.width; h = r.height;

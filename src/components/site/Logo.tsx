@@ -9,11 +9,11 @@ export function GhostMark({ className = "h-7 w-7" }: { className?: string }) {
     <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
       <defs>
         <linearGradient id="gh-g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#a99cff" /><stop offset="0.55" stopColor="#5cc8ff" /><stop offset="1" stopColor="#5eead4" />
+          <stop offset="0" stopColor="#7cb8ff" /><stop offset="0.55" stopColor="#2dd4cf" /><stop offset="1" stopColor="#4ade80" />
         </linearGradient>
       </defs>
       <path fill="url(#gh-g)" d={GHOST_PATH} />
-      <circle cx="9.3" cy="10.4" r="1.35" fill="#0b0c10" /><circle cx="14.7" cy="10.4" r="1.35" fill="#0b0c10" />
+      <circle cx="9.3" cy="10.4" r="1.35" fill="#06101c" /><circle cx="14.7" cy="10.4" r="1.35" fill="#06101c" />
     </svg>
   );
 }

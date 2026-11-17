@@ -4,39 +4,43 @@
 
 /* ---------- Design tokens: graphite + aurora. Dark is the default; [data-theme="light"] overrides. ---------- */
 @theme {
-  --color-ink: #0b0c10;
-  --color-surface: #12141a;
-  --color-raised: #1a1d26;
-  --color-line: #272b37;
-  --color-text: #eef0f6;
-  --color-muted: #aab0c0;
-  --color-faint: #8a91a4;
-  --color-accent: #8f84ff;
-  --color-accent-ink: #0b0b14;
+  --color-ink: #06101c;
+  --color-surface: #0b1a2b;
+  --color-raised: #112640;
+  --color-line: #1d3a58;
+  --color-text: #eaf5ff;
+  --color-muted: #a3bdd6;
+  --color-faint: #86a3bf;
+  --color-accent: #4da3ff;
+  --color-accent-ink: #04101f;
+  --color-teal: #2dd4cf;
+  --color-leaf: #4ade80;
   --color-blood: #1e3a8a;
-  --color-navy: #0b1730;
-  --color-steel: #7d93bd;
-  --color-sage: #6ee7b7;
+  --color-navy: #07182b;
+  --color-steel: #7ba4cf;
+  --color-sage: #4ade80;
   --color-danger: #ff7a85;
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Bricolage Grotesque Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 }
 
-:root { color-scheme: dark; --glow-a: 143 132 255; --glow-b: 56 189 248; --glow-c: 52 211 153; }
+:root { color-scheme: dark; --glow-a: 59 142 246; --glow-b: 20 200 190; --glow-c: 52 211 120; }
 :root[data-theme="light"] {
   color-scheme: light;
-  --color-ink: #f5f6fa;
+  --color-ink: #f0f7fd;
   --color-surface: #ffffff;
-  --color-raised: #eceef5;
-  --color-line: #dcdfea;
-  --color-text: #12141c;
-  --color-muted: #444b5e;
-  --color-faint: #5d6578;
-  --color-accent: #5446e0;
+  --color-raised: #e3eff9;
+  --color-line: #cbdeee;
+  --color-text: #08192b;
+  --color-muted: #37506a;
+  --color-faint: #4f677f;
+  --color-accent: #0b63d1;
   --color-accent-ink: #ffffff;
-  --color-sage: #0f7a5a;
+  --color-teal: #0a8a8f;
+  --color-leaf: #138a52;
+  --color-sage: #0f7a4a;
   --color-danger: #c62839;
-  --glow-a: 84 70 224; --glow-b: 14 130 214; --glow-c: 16 160 120;
+  --glow-a: 11 99 209; --glow-b: 8 145 150; --glow-c: 19 138 82;
 }
 
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
@@ -63,8 +67,8 @@ body {
   }
   .btn-primary {
     color: #fff;
-    background: linear-gradient(135deg, #6246ea, #3a63e0);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 8px 24px -10px rgb(98 70 234 / 0.8);
+    background: linear-gradient(135deg, #1565d8, #0c7f93);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 8px 24px -10px rgb(21 101 216 / 0.75);
   }
   .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
   .btn-ghost { @apply border border-line bg-surface/50 text-text hover:border-accent/50 hover:bg-raised; }
@@ -113,14 +117,14 @@ dialog { max-width: 100vw; max-height: 100dvh; }
 .progress { display: none; }
 @supports (animation-timeline: scroll()) {
   .progress { display: block; position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 60; pointer-events: none;
-    background: linear-gradient(90deg, #8f84ff, #38bdf8, #34d399); transform-origin: 0 50%; transform: scaleX(0);
+    background: linear-gradient(90deg, #4da3ff, #2dd4cf, #4ade80); transform-origin: 0 50%; transform: scaleX(0);
     animation: grow linear both; animation-timeline: scroll(root block); }
   @keyframes grow { to { transform: scaleX(1); } }
 }
 
 /* Gradient headline words. */
-.grad-text { background: linear-gradient(100deg, #b7aeff 0%, #6fd0ff 55%, #6ee7c0 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-:root[data-theme="light"] .grad-text { background-image: linear-gradient(100deg, #4f3fe0 0%, #0a76cc 55%, #0d9672 100%); }
+.grad-text { background: linear-gradient(100deg, #7cb8ff 0%, #2dd4cf 55%, #5eea9a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-background-clip: text; background-clip: text; color: transparent; }
+:root[data-theme="light"] .grad-text { background-image: linear-gradient(100deg, #0b63d1 0%, #0a8a8f 55%, #138a52 100%); }
 
 /* Hero aurora: two drifting colour fields, transform-only so it stays cheap on phones. */
 .aurora { position: absolute; inset: 0; overflow: hidden; pointer-events: none; mask-image: linear-gradient(to bottom, #000 55%, transparent); }
@@ -132,7 +136,7 @@ dialog { max-width: 100vw; max-height: 100dvh; }
 
 /* Header nav underline. */
 .nav-link { position: relative; }
-.nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, #8f84ff, #38bdf8); transform: scaleX(0); transform-origin: 0 50%; transition: transform 0.2s; }
+.nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, #4da3ff, #2dd4cf); transform: scaleX(0); transform-origin: 0 50%; transition: transform 0.2s; }
 .nav-link:hover::after, .nav-link:focus-visible::after { transform: scaleX(1); }
 
 /* Tiles: lift, category-coloured glow, and a soft spotlight that follows the pointer. */

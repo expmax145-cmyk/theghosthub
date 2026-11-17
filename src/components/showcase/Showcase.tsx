@@ -77,7 +77,7 @@ function Tile({ p, big, index }: { p: ShowcaseProject; big?: boolean; index: num
           // eslint-disable-next-line @next/next/no-img-element
           <img src={p.thumb} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center" style={{ background: `radial-gradient(120% 120% at 20% 8%, color-mix(in srgb, ${tint} 55%, #0b0c10), #0b0c10 75%)` }}>
+          <div className="flex h-full w-full items-center justify-center" style={{ background: `radial-gradient(120% 120% at 20% 8%, color-mix(in srgb, ${tint} 55%, #06101c), #06101c 75%)` }}>
             <span className="font-display text-5xl text-white/85 sm:text-6xl">{initials(p.name)}</span>
           </div>
         )}
@@ -186,7 +186,7 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
           <div className="relative mx-auto max-w-[1500px] px-4 pb-6 pt-7 sm:px-6 sm:pb-8 sm:pt-10">
             <Mascot say={say} className="absolute right-4 top-3 z-10 h-16 w-14 sm:right-10 sm:top-8 sm:h-44 sm:w-40 lg:right-16 lg:h-52 lg:w-48" />
             <p className="rise inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 px-3 py-1 text-xs font-medium text-muted backdrop-blur">
-              <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34d399] opacity-60" /><span className="relative inline-flex h-2 w-2 rounded-full bg-[#34d399]" /></span>
+              <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#4ade80] opacity-60" /><span className="relative inline-flex h-2 w-2 rounded-full bg-[#4ade80]" /></span>
               Live &middot; hover a tile to preview<span className="hidden sm:contents"> &middot; press <kbd className="kbd">Ctrl K</kbd></span>
             </p>
             <h1 className="rise mt-3 max-w-4xl font-display text-[2rem] font-bold leading-[1.04] tracking-tight sm:text-5xl lg:text-[3.4rem]" style={{ animationDelay: "60ms" }}>
