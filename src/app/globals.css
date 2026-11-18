@@ -222,3 +222,17 @@ html:not(.js) [data-intro], html[data-intro-seen] [data-intro] { display: none !
 @keyframes intro-shake { 0%, 100% { translate: 0 0; } 15% { translate: -14px 6px; } 30% { translate: 12px -8px; } 45% { translate: -10px -5px; } 60% { translate: 8px 7px; } 80% { translate: -4px 2px; } }
 .intro-wisp { opacity: 0; translate: 0 90px; transition: opacity 0.4s, translate 0.6s cubic-bezier(0.2, 1.2, 0.3, 1); }
 .intro-wisp.show { opacity: 1; translate: 0 0; }
+
+/* Wisp party */
+.party-flash { animation: party-flash 0.9s steps(1) infinite; mix-blend-mode: screen; opacity: 0.16; }
+@keyframes party-flash { 0% { background: radial-gradient(circle at 20% 80%, #4f8bff, transparent 60%); } 25% { background: radial-gradient(circle at 80% 80%, #ff7eb6, transparent 60%); } 50% { background: radial-gradient(circle at 50% 20%, #38e0c0, transparent 60%); } 75% { background: radial-gradient(circle at 50% 70%, #ffd166, transparent 60%); } }
+.party-beam { position: absolute; bottom: -10%; width: 38vmax; height: 120vmax; transform-origin: 50% 100%; mix-blend-mode: screen; opacity: 0.22; filter: blur(6px); }
+.party-beam-a { left: 8%; background: linear-gradient(to top, #4f8bff, transparent 85%); clip-path: polygon(46% 100%, 54% 100%, 100% 0, 0 0); animation: beam-a 2.4s ease-in-out infinite alternate; }
+.party-beam-b { right: 8%; background: linear-gradient(to top, #ff7eb6, transparent 85%); clip-path: polygon(46% 100%, 54% 100%, 100% 0, 0 0); animation: beam-b 2.4s ease-in-out infinite alternate; }
+@keyframes beam-a { from { rotate: -35deg; } to { rotate: 25deg; } }
+@keyframes beam-b { from { rotate: 35deg; } to { rotate: -25deg; } }
+.party-banner span { display: inline-block; animation: party-bounce 0.6s ease-in-out infinite; animation-delay: calc(var(--i) * 70ms); text-shadow: 0 6px 24px rgb(0 0 0 / 0.35); }
+@keyframes party-bounce { 0%, 100% { transform: translateY(0) rotate(-4deg) scale(1); } 50% { transform: translateY(-16px) rotate(5deg) scale(1.12); } }
+.party-dancer { translate: -50% 0; animation: party-dance 0.7s ease-in-out infinite alternate; transform-origin: 50% 100%; }
+@keyframes party-dance { from { rotate: -9deg; transform: translateY(0) scale(1); } to { rotate: 9deg; transform: translateY(-22px) scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .party-flash, .party-beam, .party-banner span, .party-dancer { animation: none; } .party-flash, .party-beam { display: none; } }
