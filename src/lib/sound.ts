@@ -3,7 +3,7 @@
  * Sound is ON by default and can be switched off with the speaker button; browsers only allow audio
  * after a first tap/click/key, so everything starts on that first interaction.
  */
-const KEY = "ghosthub-sound";
+const KEY = "ghosthub-music";   // only the background music can be switched off; effects always play
 
 type Bus = { ctx: AudioContext; sfx: GainNode; music: GainNode; noise: AudioBuffer };
 let bus: Bus | null = null;
@@ -11,7 +11,7 @@ let timer = 0;
 let nextTime = 0;
 let step = 0;
 
-export function soundOn(): boolean {
+export function musicOn(): boolean {
   try { return localStorage.getItem(KEY) !== "0"; } catch { return true; }
 }
 
@@ -37,7 +37,7 @@ function build(): Bus | null {
   } catch { return null; }
 }
 
-const live = () => (bus && bus.ctx.state === "running" && soundOn() ? bus : null);
+const live = () => (bus && bus.ctx.state === "running" ? bus : null);
 const mtof = (m: number) => 440 * Math.pow(2, (m - 69) / 12);
 
 function tone(freq: number, dur: number, type: OscillatorType = "sine", vol = 0.2, slideTo?: number, when = 0, out?: AudioNode) {
@@ -143,7 +143,7 @@ function schedule() {
 }
 
 export function startMusic() {
-  const b = bus; if (!b || timer || !soundOn()) return;
+  const b = bus; if (!b || timer || !musicOn()) return;
   nextTime = b.ctx.currentTime + 0.15; step = 0;
   b.music.gain.cancelScheduledValues(b.ctx.currentTime);
   b.music.gain.setValueAtTime(b.music.gain.value, b.ctx.currentTime);
@@ -158,16 +158,17 @@ export function stopMusic() {
 /** Call from a user gesture: creates/resumes the audio engine and starts the music if sound is on. */
 export function unlockAudio(): boolean {
   const b = build(); if (!b) return false;
-  if (b.ctx.state !== "running") void b.ctx.resume().then(() => { if (soundOn()) startMusic(); });
-  else if (soundOn()) startMusic();
+  if (b.ctx.state !== "running") void b.ctx.resume().then(() => { if (musicOn()) startMusic(); });
+  else if (musicOn()) startMusic();
   return true;
 }
 export const audioRunning = () => !!bus && bus.ctx.state === "running";
 
-export function setSound(on: boolean) {
+export function setMusic(on: boolean) {
   try { localStorage.setItem(KEY, on ? "1" : "0"); } catch { /* storage blocked */ }
-  window.dispatchEvent(new CustomEvent("ghosthub:sound", { detail: on }));
-  if (on) { unlockAudio(); setTimeout(() => sfx.success(), 120); } else stopMusic();
+  window.dispatchEvent(new CustomEvent("ghosthub:music", { detail: on }));
+  if (on) unlockAudio(); else stopMusic();
+  setTimeout(() => sfx.pop(), 60);
 }
 
 /** Pause while the tab is hidden, resume when it is back. */

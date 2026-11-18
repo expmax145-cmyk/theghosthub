@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { goTo, surpriseHref, usePaletteProjects } from "@/lib/palette";
 import { applyTheme, currentTheme } from "@/lib/theme";
 import { categoryColor } from "@/lib/kind";
-import { setSound, sfx, soundOn } from "@/lib/sound";
+import { musicOn, setMusic, sfx } from "@/lib/sound";
 
 type Item = { id: string; label: string; hint: string; group: string; run: () => void; tint?: string };
 
@@ -47,7 +47,7 @@ export default function CommandPalette() {
       { id: "studio", label: "Creator sign in", hint: "Studio", group: "Go to", run: () => go("/studio") },
       { id: "surprise", label: "Surprise me", hint: "Open a random creation", group: "Actions", run: () => { const h = surpriseHref(); setOpen(false); if (h) goTo(h); } },
       { id: "party", label: "Wisp party", hint: "Try ↑ ↑ ↓ ↓ ← → ← → B A", group: "Actions", run: () => { setOpen(false); setTimeout(() => window.dispatchEvent(new Event("ghosthub:party")), 150); } },
-      { id: "sound", label: "Toggle sound & music", hint: "Speaker on / off", group: "Actions", run: () => { setOpen(false); setSound(!soundOn()); } },
+      { id: "music", label: "Toggle background music", hint: "Sound effects stay on", group: "Actions", run: () => { setOpen(false); setMusic(!musicOn()); } },
       { id: "theme", label: "Toggle light / dark theme", hint: "Appearance", group: "Actions", run: () => { applyTheme(currentTheme() === "dark" ? "light" : "dark"); setOpen(false); } },
       { id: "intro", label: "Replay intro animation", hint: "Wisp says hi", group: "Actions", run: () => { setOpen(false); try { sessionStorage.removeItem("ghosthub-intro-v2"); } catch { /* blocked */ } if (location.pathname === "/") window.dispatchEvent(new Event("ghosthub:intro")); else location.assign("/"); } },
     ];
