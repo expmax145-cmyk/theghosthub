@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import AskWisp from "./AskWisp";
 
 const DOORS = [
   { label: "Games", note: "Play in your browser, no install.", tint: "#4da3ff", icon: <><rect x="3" y="8" width="18" height="10" rx="5" /><path d="M8 11v4M6 13h4M16 12h.01M18 14h.01" /></> },
@@ -39,8 +40,7 @@ export default function ComingSoon() {
         ))}
       </div>
       <div className="mt-8 flex flex-wrap justify-center gap-3" data-reveal>
-        <Link href="/arcade" className="btn btn-primary">Play Wisp Catch while you wait</Link>
-        <Link href="/explore" className="btn btn-ghost">Open the orbit map</Link>
+        <AskWisp label="Ask Wisp while you wait ✦" primary />
       </div>
       <p className="mt-6 text-center text-sm text-muted" data-reveal>Want to know when it opens? <Link href="/contact" className="font-medium text-accent underline-offset-4 hover:underline">Say hello</Link>.</p>
     </div>

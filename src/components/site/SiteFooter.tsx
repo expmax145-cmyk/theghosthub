@@ -14,8 +14,6 @@ export default function SiteFooter({ owner = "Ghost Hub", wide = false, children
           <p className="text-xs text-faint">&copy; {new Date().getFullYear()} {owner}</p>
         </div>
         <nav aria-label="Footer" className="grid grid-cols-2 content-start gap-x-6 gap-y-2.5 text-sm text-muted">
-          <Link href="/explore" className="hover:text-text">Explore</Link>
-          <Link href="/arcade" className="hover:text-text">Arcade</Link>
           <Link href="/about" className="hover:text-text">About</Link>
           <Link href="/privacy" className="hover:text-text">Privacy</Link>
           <Link href="/contact" className="hover:text-text">Contact</Link>

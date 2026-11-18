@@ -50,6 +50,16 @@ export default function Mascot({ say, className = "" }: { say?: string; classNam
     window.addEventListener("ghosthub:party", party);
     return () => window.removeEventListener("ghosthub:party", party);
   }, []);
+  // Time-aware hello, once the intro is out of the way.
+  useEffect(() => {
+    const hr = new Date().getHours();
+    const msg = hr < 5 ? "Up this late? Respect. Night owls unite." : hr < 12 ? "Good morning! Ghosts are early risers too." : hr < 17 ? "Good afternoon! Perfect time to explore." : hr < 22 ? "Good evening! Prime haunting hours." : "Night owl detected. We're the same.";
+    let waited = 0, t = 0;
+    const check = () => { if (document.documentElement.dataset.introSeen === "1") t = window.setTimeout(() => speak(msg), 900); else if ((waited += 500) < 25000) t = window.setTimeout(check, 500); };
+    check();
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const text = line;
 
   return (

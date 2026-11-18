@@ -27,6 +27,12 @@ const csp = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  async redirects() {
+    return [
+      { source: "/explore", destination: "/", permanent: false },
+      { source: "/arcade", destination: "/", permanent: false },
+    ];
+  },
   async headers() {
     return [
       {

@@ -3,8 +3,6 @@ export const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theghosthub.ver
 export const CONTACT_EMAIL = (process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "").trim();
 export const NAV = [
   { href: "/#work", label: "Work" },
-  { href: "/explore", label: "Explore" },
-  { href: "/arcade", label: "Arcade" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];

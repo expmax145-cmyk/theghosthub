@@ -11,6 +11,8 @@ import Intro from "./Intro";
 import Mascot from "./Mascot";
 import Constellation from "./Constellation";
 import ComingSoon from "./ComingSoon";
+import AskWisp from "./AskWisp";
+import Typewriter from "./Typewriter";
 
 type Sort = "recent" | "newest" | "oldest" | "name";
 
@@ -196,14 +198,12 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
             <div className="rise mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" style={{ animationDelay: "120ms" }}>
               <div className="max-w-xl">
                 <p className="text-[15px] leading-relaxed text-muted sm:text-base">Play in the browser, install on Android, or visit the live sites. Made by {name}.</p>
-                {projects.length > 0 && (
-                  <div className="mt-4 flex flex-wrap items-center gap-2.5">
-                    <Link href="/explore" className="btn btn-ghost btn-sm">Orbit map</Link>
-                    <Link href="/arcade" className="btn btn-ghost btn-sm">Play Wisp Catch</Link>
-                    <button type="button" className="btn btn-primary btn-sm" onClick={() => { const h = surpriseHref(); if (h) goTo(h); }}>Surprise me ✦</button>
+                <p className="mt-2 text-sm text-muted sm:text-[15px]">Made for <Typewriter words={["people who love games", "tiny apps with big ideas", "weird little experiments", "late-night ideas", "curious humans"]} /></p>
+                <div className="mt-4 flex flex-wrap items-center gap-2.5">
+                    <AskWisp />
+                    {projects.length > 0 && <button type="button" className="btn btn-primary btn-sm" onClick={() => { const h = surpriseHref(); if (h) goTo(h); }}>Surprise me ✦</button>}
                     {latest && <a href={tileHref(latest)} className="inline-flex max-w-full items-center gap-2 truncate rounded-full border border-line bg-surface/60 px-3 py-1.5 text-xs text-muted backdrop-blur hover:border-accent/50 hover:text-text"><span className="rounded-full bg-accent px-1.5 py-px text-[10px] font-bold uppercase text-accent-ink">Latest</span><span className="truncate">{latest.name}</span></a>}
-                  </div>
-                )}
+                </div>
               </div>
               {stats.length > 0 && (
                 <dl className="flex flex-wrap gap-x-6 gap-y-2">
