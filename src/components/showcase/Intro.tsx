@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { GHOST_PATH } from "@/components/site/Logo";
+import { GHOST_PATH, GhostMark } from "@/components/site/Logo";
+import { blip } from "@/lib/sound";
 
 const SEEN = "ghosthub-intro-v2";
 const DARK = ["#7cb8ff", "#4da3ff", "#2dd4cf", "#4ade80", "#9bd0ff"];
@@ -33,10 +34,24 @@ function sampleTargets(w: number, h: number, step: number): [number, number][] {
   return pts;
 }
 
+const pick = <T,>(a: T[]) => a[(Math.random() * a.length) | 0];
+const AFTER_SNEEZE = ["Bless you. (I said it to myself.)", "Ghost allergies. It's the dust. So much dust.", "Gesundheit. Ghost-undheit.", "Sorry! I was holding that in since 1987."];
+const REASSEMBLE = ["Reassembling… found 1 spare sock.", "Reassembling… 2 pieces left over. Probably fine.", "Reassembling… who put my head on backwards?", "Reassembling… please hold your applause."];
+const WISP_2 = ["…no screaming? Tough crowd.", "Nobody screamed. I'm crying. Spooky tears.", "That was my best scare. My ONLY scare."];
+const WISP_3 = ["Fine. Come in. Wipe your feet. (I have none.)", "Go on in. Don't touch anything. (Touch EVERYTHING.)", "Welcome! I'd shake your hand, but, you know. Ghost."];
+
+// Timeline (ms): swirl in -> tension -> ACHOO -> scatter -> reassemble -> Wisp says hi -> burst into the site.
+const T_IN = 1800, T_SNEEZE = 3250, T_FLY = 4300, T_REFORM = 5700, T_BURST = 8300, T_END = 9000;
+
 export default function Intro() {
   const [run, setRun] = useState(0);        // 0 = not running
   const [gone, setGone] = useState(false);
   const cvs = useRef<HTMLCanvasElement>(null);
+  const shake = useRef<HTMLDivElement>(null);
+  const cap = useRef<HTMLParagraphElement>(null);
+  const achoo = useRef<HTMLDivElement>(null);
+  const wisp = useRef<HTMLDivElement>(null);
+  const bubble = useRef<HTMLParagraphElement>(null);
   const done = useRef<() => void>(() => {});
 
   useEffect(() => {
@@ -71,11 +86,18 @@ export default function Intro() {
     const ps: P[] = Array.from({ length: count }, (_, i) => {
       const a = Math.random() * Math.PI * 2, r = R * (0.45 + Math.random() * 0.6);
       const [tx, ty] = targets[i];
-      return { x: 0, y: 0, sx: w / 2 + Math.cos(a) * r, sy: h / 2 + Math.sin(a) * r, tx, ty, a, r, c: COLORS[(Math.random() * COLORS.length) | 0], vx: (Math.random() - 0.5) * 2, vy: (Math.random() - 0.5) * 2 };
+      return { x: tx, y: ty, sx: 0, sy: 0, tx, ty, a, r, c: COLORS[(Math.random() * COLORS.length) | 0], vx: 0, vy: 0 };
     });
-    const T_IN = 1900, T_HOLD = 2800, T_END = 3500;
+    // Per-run jokes, so a replay is not the same show twice.
+    const afterSneeze = pick(AFTER_SNEEZE), reassemble = pick(REASSEMBLE), wisp2 = pick(WISP_2), wisp3 = pick(WISP_3);
+    const lines: [number, string][] = [[5650, "BOO!"], [6450, wisp2], [7350, wisp3]];
+    wisp.current?.classList.remove("show"); achoo.current?.classList.remove("go");
+    if (cap.current) cap.current.textContent = "";
+    if (bubble.current) bubble.current.textContent = "";
+
     const start = performance.now();
-    let raf = 0, finished = false, mx = -999, my = -999, burstAt = 0;
+    let raf = 0, finished = false, mx = -999, my = -999, exploded = false, capNow = "", lineIdx = 0, shakeUntil = 0;
+    const setCap = (t: string) => { if (t !== capNow && cap.current) { capNow = t; cap.current.textContent = t; } };
     const ease = (t: number) => 1 - Math.pow(1 - t, 3);
     const finish = () => {
       if (finished) return; finished = true;
@@ -90,29 +112,63 @@ export default function Intro() {
     const key = (e: KeyboardEvent) => { if (e.key === "Escape" || e.key === "Enter" || e.key === " ") finish(); };
     window.addEventListener("pointermove", move);
     window.addEventListener("keydown", key);
+
     const frame = (now: number) => {
       const t = now - start;
       ctx.clearRect(0, 0, w, h);
       ctx.globalCompositeOperation = light ? "source-over" : "lighter";
-      const fade = t > T_HOLD ? Math.max(0, 1 - (t - T_HOLD) / (T_END - T_HOLD)) : 1;
+      const fade = t > T_BURST ? Math.max(0, 1 - (t - T_BURST) / (T_END - T_BURST)) : 1;
       canvas.style.opacity = String(fade);
-      if (t > T_HOLD && !burstAt) burstAt = now;
+
+      // Captions + gags, driven by the clock.
+      if (t < T_IN) setCap(`Summoning ghost… ${Math.min(99, Math.floor(ease(t / T_IN) * 99))}%`);
+      else if (t < 2400) setCap("99%… still 99%…");
+      else if (t < 2900) setCap("Wait. Is the ghost about to…?");
+      else if (t < T_SNEEZE) setCap("ah… ah…");
+      else if (t < T_FLY) setCap(afterSneeze);
+      else if (t < T_REFORM) setCap(reassemble);
+      else setCap("");
+      if (!exploded && t >= T_SNEEZE) {
+        exploded = true; shakeUntil = t + 450;
+        for (const p of ps) {
+          const dx = p.tx - w / 2, dy = p.ty - h * 0.45, len = Math.hypot(dx, dy) || 1, sp = 7 + Math.random() * 15;
+          p.vx = (dx / len) * sp + (Math.random() - 0.5) * 6; p.vy = (dy / len) * sp - Math.random() * 5;
+        }
+        const a = achoo.current; if (a) { a.classList.remove("go"); void a.offsetWidth; a.classList.add("go"); }
+        blip(180, 0.25, 0.09);
+      }
+      if (shake.current) shake.current.classList.toggle("intro-shake", t < shakeUntil);
+      if (t >= 5400 && wisp.current && !wisp.current.classList.contains("show")) wisp.current.classList.add("show");
+      while (lineIdx < lines.length && t >= lines[lineIdx][0]) {
+        const b = bubble.current;
+        if (b) { b.textContent = lines[lineIdx][1]; b.classList.remove("bubble"); void b.offsetWidth; b.classList.add("bubble"); }
+        blip(lineIdx === 0 ? 620 : 480, 0.08, 0.05);
+        lineIdx++;
+      }
+
       for (const p of ps) {
         if (t < T_IN) {
           const k = ease(Math.min(1, t / T_IN));
-          const ang = p.a + (1 - k) * 5;               // spiral inwards
-          const rr = p.r * (1 - k);
-          p.x = p.tx + Math.cos(ang) * rr * 0.9 ; p.y = p.ty + Math.sin(ang) * rr * 0.9;
-        } else if (t < T_HOLD) {
-          // hold: shimmer, with a gentle push away from the pointer
+          const ang = p.a + (1 - k) * 5, rr = p.r * (1 - k);
+          p.x = p.tx + Math.cos(ang) * rr * 0.9; p.y = p.ty + Math.sin(ang) * rr * 0.9;
+        } else if (t < T_SNEEZE) {
+          // tension: the whole ghost trembles harder and harder
+          const q = (t - T_IN) / (T_SNEEZE - T_IN), amp = 0.9 + 7 * q * q;
+          p.x = p.tx + Math.sin(t / 38 + p.a * 9) * amp; p.y = p.ty + Math.cos(t / 41 + p.a * 7) * amp;
+        } else if (t < T_FLY) {
+          p.vx *= 0.965; p.vy = p.vy * 0.965 + 0.12; p.x += p.vx; p.y += p.vy;
+        } else if (t < T_REFORM) {
+          const k = 0.05 + 0.1 * ((t - T_FLY) / (T_REFORM - T_FLY));
+          p.x += (p.tx - p.x) * k; p.y += (p.ty - p.y) * k;
+        } else if (t < T_BURST) {
           const jx = Math.sin(t / 260 + p.a * 9) * 0.9, jy = Math.cos(t / 300 + p.a * 7) * 0.9;
           let ox = 0, oy = 0;
           const dx = p.tx - mx, dy = p.ty - my, d2 = dx * dx + dy * dy;
-          if (d2 < 6400) { const f = (80 - Math.sqrt(d2)) / 80; ox = (dx / (Math.sqrt(d2) || 1)) * f * 26; oy = (dy / (Math.sqrt(d2) || 1)) * f * 26; }
+          if (d2 < 6400) { const d = Math.sqrt(d2) || 1, f = (80 - d) / 80; ox = (dx / d) * f * 26; oy = (dy / d) * f * 26; }
           p.x += (p.tx + jx + ox - p.x) * 0.22; p.y += (p.ty + jy + oy - p.y) * 0.22;
         } else {
           const dx = p.tx - w / 2, dy = p.ty - h / 2, len = Math.hypot(dx, dy) || 1;
-          p.x += (dx / len) * 14 + p.vx; p.y += (dy / len) * 14 + p.vy;
+          p.x += (dx / len) * 14 + (p.vx % 3); p.y += (dy / len) * 14 + (p.vy % 3);
         }
         ctx.fillStyle = p.c;
         ctx.globalAlpha = 0.9;
@@ -131,9 +187,17 @@ export default function Intro() {
 
   if (gone) return null;
   return (
-    <div data-intro className={`fixed inset-0 z-[300] bg-ink `} role="dialog" aria-label="Welcome animation" onClick={() => done.current()}>
-      <canvas ref={cvs} className="absolute inset-0 h-full w-full" aria-hidden="true" />
-      <button type="button" onClick={(e) => { e.stopPropagation(); done.current(); }} className="btn btn-ghost btn-sm absolute bottom-6 right-5">Skip</button>
+    <div data-intro className="fixed inset-0 z-[300] bg-ink" role="dialog" aria-label="Welcome animation" onClick={() => done.current()}>
+      <div ref={shake} className="absolute inset-0">
+        <canvas ref={cvs} className="absolute inset-0 h-full w-full" aria-hidden="true" />
+      </div>
+      <div ref={achoo} className="intro-achoo pointer-events-none absolute inset-x-0 top-[14%] text-center font-display text-5xl font-extrabold uppercase tracking-tight text-accent sm:text-7xl" aria-hidden="true">Achoo!</div>
+      <div ref={wisp} className="intro-wisp pointer-events-none absolute inset-x-0 bottom-24 flex flex-col items-center gap-2 px-4 sm:bottom-20" aria-hidden="true">
+        <p ref={bubble} className="min-h-[2.5rem] w-max max-w-[18rem] rounded-2xl rounded-b-sm border border-line bg-surface/95 px-3.5 py-2 text-center text-sm leading-snug text-text shadow-lg sm:max-w-sm sm:text-base" />
+        <GhostMark className="wisp-float h-16 w-16 drop-shadow-[0_10px_24px_rgb(var(--glow-a)/0.5)]" />
+      </div>
+      <p ref={cap} className="pointer-events-none absolute inset-x-0 bottom-9 px-6 text-center text-sm font-medium text-muted sm:text-base" role="status" aria-live="off" />
+      <button type="button" onClick={(e) => { e.stopPropagation(); done.current(); }} className="btn btn-ghost btn-sm absolute right-4 top-4">Skip ›</button>
     </div>
   );
 }
