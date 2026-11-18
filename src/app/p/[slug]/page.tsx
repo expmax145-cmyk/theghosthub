@@ -5,6 +5,7 @@ import { loadShowcase } from "@/lib/showcase";
 import { SITE } from "@/lib/site";
 import { STATUS_LABEL } from "@/lib/types";
 import { formatBytes, formatDate, safeUrl } from "@/lib/utils";
+import ShareButton from "@/components/site/ShareButton";
 import { categoryColor, kindOf, latestApk } from "@/lib/kind";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
@@ -116,10 +117,10 @@ export default async function ProjectPage({ params }: Props) {
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 h-[3px]" aria-hidden="true" style={{ background: `linear-gradient(90deg, transparent, ${categoryColor(p.category)}, transparent)` }} />
       <SiteHeader />
       <main id="main" className="mx-auto max-w-4xl space-y-10 px-4 pb-24 pt-8 sm:px-6 sm:pt-12">
-        <nav aria-label="Breadcrumb" className="text-xs text-faint">
+        <div className="flex items-center justify-between gap-3"><nav aria-label="Breadcrumb" className="text-xs text-faint">
           <Link href="/" className="hover:text-text">Ghost Hub</Link> <span aria-hidden="true">/</span>{" "}
           <Link href={`/?cat=${encodeURIComponent(p.category)}#work`} className="hover:text-text">{p.category}</Link>
-        </nav>
+        </nav><ShareButton title={p.name} /></div>
 
         {apk ? (
           <header className="flex flex-col gap-6 sm:flex-row sm:items-start">

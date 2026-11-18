@@ -198,6 +198,8 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
                 <p className="text-[15px] leading-relaxed text-muted sm:text-base">Play in the browser, install on Android, or visit the live sites. Made by {name}.</p>
                 {projects.length > 0 && (
                   <div className="mt-4 flex flex-wrap items-center gap-2.5">
+                    <Link href="/explore" className="btn btn-ghost btn-sm">Orbit map</Link>
+                    <Link href="/arcade" className="btn btn-ghost btn-sm">Play Wisp Catch</Link>
                     <button type="button" className="btn btn-primary btn-sm" onClick={() => { const h = surpriseHref(); if (h) goTo(h); }}>Surprise me ✦</button>
                     {latest && <a href={tileHref(latest)} className="inline-flex max-w-full items-center gap-2 truncate rounded-full border border-line bg-surface/60 px-3 py-1.5 text-xs text-muted backdrop-blur hover:border-accent/50 hover:text-text"><span className="rounded-full bg-accent px-1.5 py-px text-[10px] font-bold uppercase text-accent-ink">Latest</span><span className="truncate">{latest.name}</span></a>}
                   </div>

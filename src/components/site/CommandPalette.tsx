@@ -38,6 +38,8 @@ export default function CommandPalette() {
   const items = useMemo<Item[]>(() => {
     const base: Item[] = [
       { id: "home", label: "Home", hint: "Browse everything", group: "Go to", run: () => go("/") },
+      { id: "explore", label: "Explore the orbit map", hint: "Planets and rings", group: "Go to", run: () => go("/explore") },
+      { id: "arcade", label: "Play Wisp Catch", hint: "Arcade game", group: "Go to", run: () => go("/arcade") },
       { id: "about", label: "About", hint: "Who made this", group: "Go to", run: () => go("/about") },
       { id: "contact", label: "Contact", hint: "Say hello", group: "Go to", run: () => go("/contact") },
       { id: "studio", label: "Creator sign in", hint: "Studio", group: "Go to", run: () => go("/studio") },

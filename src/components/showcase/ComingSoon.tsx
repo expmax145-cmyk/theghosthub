@@ -38,7 +38,11 @@ export default function ComingSoon() {
           </div>
         ))}
       </div>
-      <p className="mt-8 text-center text-sm text-muted" data-reveal>Want to know when it opens? <Link href="/contact" className="font-medium text-accent underline-offset-4 hover:underline">Say hello</Link>.</p>
+      <div className="mt-8 flex flex-wrap justify-center gap-3" data-reveal>
+        <Link href="/arcade" className="btn btn-primary">Play Wisp Catch while you wait</Link>
+        <Link href="/explore" className="btn btn-ghost">Open the orbit map</Link>
+      </div>
+      <p className="mt-6 text-center text-sm text-muted" data-reveal>Want to know when it opens? <Link href="/contact" className="font-medium text-accent underline-offset-4 hover:underline">Say hello</Link>.</p>
     </div>
   );
 }
