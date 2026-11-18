@@ -3,7 +3,6 @@ import "./globals.css";
 import BackToTop from "@/components/site/BackToTop";
 import CommandPalette from "@/components/site/CommandPalette";
 import Interactions from "@/components/site/Interactions";
-import Party from "@/components/site/Party";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theghosthub.vercel.app";
 const DESCRIPTION = "Ghost Hub is a personal digital headquarters: Android apps, browser games, websites and AI experiments, all in one place.";
@@ -32,7 +31,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <BackToTop />
         <CommandPalette />
         <Interactions />
-        <Party />
       </body>
     </html>
   );
