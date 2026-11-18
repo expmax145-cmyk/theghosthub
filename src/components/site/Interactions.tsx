@@ -1,11 +1,25 @@
 "use client";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { blip } from "@/lib/sound";
+import { audioRunning, bindVisibility, sfx, unlockAudio } from "@/lib/sound";
+import { useRef } from "react";
 
 /** Global behaviours with no markup: scroll reveals, button ripples + magnetic pull, smart header. */
 export default function Interactions() {
   const path = usePathname();
+  const firstPath = useRef(true);
+
+  // A whoosh on every page change.
+  useEffect(() => { if (firstPath.current) { firstPath.current = false; return; } sfx.nav(); }, [path]);
+
+  // Browsers only allow audio after a gesture: the first tap, click or key starts the engine and the music.
+  useEffect(() => {
+    const events = ["pointerdown", "touchend", "click", "keydown"] as const;
+    const go = () => { if (unlockAudio() && audioRunning()) events.forEach((n) => window.removeEventListener(n, go, true)); };
+    events.forEach((n) => window.addEventListener(n, go, true));
+    const unbind = bindVisibility();
+    return () => { events.forEach((n) => window.removeEventListener(n, go, true)); unbind(); };
+  }, []);
 
   // Scroll reveals. Pages stream in after a client-side navigation, so watch the DOM for new
   // [data-reveal] elements instead of scanning once (a one-off scan missed them and left blank gaps).
@@ -30,7 +44,7 @@ export default function Interactions() {
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const down = (e: PointerEvent) => {
-      if ((e.target as HTMLElement | null)?.closest(".btn, .chip, [role=option]")) blip(540, 0.05);
+      if ((e.target as HTMLElement | null)?.closest(".btn, .chip, [role=option], a[href], button, article.tile, summary")) sfx.click();
       if (reduce) return;
       const el = (e.target as HTMLElement | null)?.closest<HTMLElement>(".btn, .chip");
       if (!el || (el as HTMLButtonElement).disabled) return;
@@ -77,9 +91,13 @@ export default function Interactions() {
       pos = k === code[pos] ? pos + 1 : k === code[0] ? 1 : 0;
       if (pos === code.length) { pos = 0; window.dispatchEvent(new Event("ghosthub:party")); }
     };
-    const hover = (e: PointerEvent) => { if (e.pointerType === "mouse" && (e.target as HTMLElement | null)?.closest?.("article.tile")) blip(780, 0.035, 0.025); };
-    let lastTile: Element | null = null;
-    const over = (e: PointerEvent) => { const t = (e.target as HTMLElement | null)?.closest?.("article.tile") ?? null; if (t && t !== lastTile) hover(e); lastTile = t; };
+    let lastHover: Element | null = null;
+    const over = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      const t = (e.target as HTMLElement | null)?.closest?.(".btn, .chip, .nav-link, article.tile, a[href], button, [role=option]") ?? null;
+      if (t && t !== lastHover) sfx.hover();
+      lastHover = t;
+    };
     window.addEventListener("keydown", konami);
     document.addEventListener("pointerover", over, { passive: true });
     document.addEventListener("pointerdown", down, { passive: true });

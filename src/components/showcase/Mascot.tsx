@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { GHOST_PATH } from "@/components/site/Logo";
+import { sfx } from "@/lib/sound";
 
 const LINES = ["Boo! …just kidding. Hi!", "Hover a tile and I'll show you a preview.", "Press Ctrl+K and I'll take you anywhere.", "I only haunt friendly websites.", "Psst… try the light theme.", "Need something? Just search."];
 
@@ -34,6 +35,7 @@ export default function Mascot({ say, className = "" }: { say?: string; classNam
   useEffect(() => {
     const party = () => {
       speak("↑↑↓↓←→←→BA… you found my secret!");
+      sfx.party();
       setSpin(true); setTimeout(() => setSpin(false), 950);
       if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       for (let i = 0; i < 36; i++) {
@@ -53,7 +55,7 @@ export default function Mascot({ say, className = "" }: { say?: string; classNam
   return (
     <div className={className || "relative"}>
       {text && <p key={text} className="bubble absolute -left-2 top-0 z-10 w-max max-w-[11rem] -translate-x-full rounded-2xl rounded-br-sm border border-line bg-surface/90 px-3 py-2 text-xs leading-snug text-text shadow-lg backdrop-blur sm:max-w-[14rem] sm:text-sm" role="status">{text}</p>}
-      <button ref={root} type="button" aria-label="Wisp the ghost. Click to chat." onClick={() => { speak(LINES[n % LINES.length]); setN(n + 1); }} className={`wisp-float block w-full ${spin ? "wisp-spin" : ""} cursor-pointer outline-offset-4 transition-transform active:scale-90`}>
+      <button ref={root} type="button" aria-label="Wisp the ghost. Click to chat." onClick={() => { speak(LINES[n % LINES.length]); setN(n + 1); sfx.giggle(); }} className={`wisp-float block w-full ${spin ? "wisp-spin" : ""} cursor-pointer outline-offset-4 transition-transform active:scale-90`}>
         <svg viewBox="0 0 24 26" className="h-full w-full overflow-visible drop-shadow-[0_12px_28px_rgb(var(--glow-a)/0.55)]" aria-hidden="true">
           <defs>
             <linearGradient id="wisp-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#7cb8ff" /><stop offset="0.55" stopColor="#2dd4cf" /><stop offset="1" stopColor="#4ade80" /></linearGradient>

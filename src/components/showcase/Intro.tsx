@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { GHOST_PATH, GhostMark } from "@/components/site/Logo";
-import { blip } from "@/lib/sound";
+import { audioRunning, sfx, unlockAudio } from "@/lib/sound";
 
 const SEEN = "ghosthub-intro-v2";
 const DARK = ["#7cb8ff", "#4da3ff", "#2dd4cf", "#4ade80", "#9bd0ff"];
@@ -53,6 +53,7 @@ export default function Intro() {
   const achoo = useRef<HTMLDivElement>(null);
   const wisp = useRef<HTMLDivElement>(null);
   const bubble = useRef<HTMLParagraphElement>(null);
+  const hint = useRef<HTMLParagraphElement>(null);
   const done = useRef<() => void>(() => {});
 
   useEffect(() => {
@@ -98,7 +99,7 @@ export default function Intro() {
 
     const start = performance.now();
     let raf = 0, finished = false, mx = -999, my = -999, exploded = false, capNow = "", lineIdx = 0, shakeUntil = 0;
-    const setCap = (t: string) => { if (t !== capNow && cap.current) { capNow = t; cap.current.textContent = t; if (!/\d+%$/.test(t)) { cap.current.classList.remove("bubble"); void cap.current.offsetWidth; cap.current.classList.add("bubble"); } } };
+    const setCap = (t: string) => { if (t !== capNow && cap.current) { capNow = t; cap.current.textContent = t; if (!/\d+%$/.test(t)) { cap.current.classList.remove("bubble"); void cap.current.offsetWidth; cap.current.classList.add("bubble"); if (t !== "") sfx.pop(); } } };
     const ease = (t: number) => 1 - Math.pow(1 - t, 3);
     const finish = () => {
       if (finished) return; finished = true;
@@ -136,14 +137,15 @@ export default function Intro() {
           p.vx = (dx / len) * sp + (Math.random() - 0.5) * 6; p.vy = (dy / len) * sp - Math.random() * 5;
         }
         const a = achoo.current; if (a) { a.classList.remove("go"); void a.offsetWidth; a.classList.add("go"); }
-        blip(180, 0.25, 0.09);
+        sfx.achoo();
       }
+      if (hint.current) hint.current.style.opacity = audioRunning() ? "0" : "1";
       if (shake.current) shake.current.classList.toggle("intro-shake", t < shakeUntil);
       if (t >= 9800 && wisp.current && !wisp.current.classList.contains("show")) wisp.current.classList.add("show");
       while (lineIdx < lines.length && t >= lines[lineIdx][0]) {
         const b = bubble.current;
         if (b) { b.textContent = lines[lineIdx][1]; b.classList.remove("bubble"); void b.offsetWidth; b.classList.add("bubble"); }
-        blip(lineIdx === 0 ? 620 : 480, 0.08, 0.05);
+        if (lineIdx === 0) sfx.boo(); else sfx.pop();
         lineIdx++;
       }
 
@@ -188,7 +190,7 @@ export default function Intro() {
 
   if (gone) return null;
   return (
-    <div data-intro className="fixed inset-0 z-[300] bg-ink" role="dialog" aria-label="Welcome animation" onClick={() => done.current()}>
+    <div data-intro className="fixed inset-0 z-[300] bg-ink" role="dialog" aria-label="Welcome animation" onClick={() => { if (!audioRunning()) unlockAudio(); }}>
       <div ref={shake} className="absolute inset-0">
         <canvas ref={cvs} className="absolute inset-0 h-full w-full" aria-hidden="true" />
       </div>
@@ -198,6 +200,7 @@ export default function Intro() {
         <GhostMark className="wisp-float h-16 w-16 drop-shadow-[0_10px_24px_rgb(var(--glow-a)/0.5)]" />
       </div>
       <p ref={cap} className="pointer-events-none absolute inset-x-0 bottom-9 px-6 text-center text-base font-semibold text-text sm:text-xl" role="status" aria-live="off" />
+      <p ref={hint} className="pointer-events-none absolute left-4 top-5 text-xs font-medium text-muted transition-opacity sm:text-sm" aria-hidden="true">🔊 Tap anywhere for sound</p>
       <button type="button" onClick={(e) => { e.stopPropagation(); done.current(); }} className="btn btn-ghost btn-sm absolute right-4 top-4">Skip ›</button>
     </div>
   );

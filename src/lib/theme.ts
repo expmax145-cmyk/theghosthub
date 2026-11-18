@@ -1,3 +1,5 @@
+import { sfx } from "./sound";
+
 export type Theme = "dark" | "light";
 
 export function currentTheme(): Theme {
@@ -10,4 +12,5 @@ export function applyTheme(next: Theme) {
   try { localStorage.setItem("ghosthub-theme", next); } catch { /* storage blocked */ }
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "dark" ? "#06101c" : "#f0f7fd");
   window.dispatchEvent(new CustomEvent("ghosthub:theme", { detail: next }));
+  sfx.theme();
 }
