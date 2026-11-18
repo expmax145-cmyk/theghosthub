@@ -21,6 +21,7 @@ export default function SiteFooter({ owner = "Ghost Hub", wide = false, children
           <Link href="/contact" className="hover:text-text">Contact</Link>
           <Link href="/terms" className="hover:text-text">Terms</Link>
           {CONTACT_EMAIL && <a href={`mailto:${CONTACT_EMAIL}`} className="col-span-2 break-all hover:text-text">{CONTACT_EMAIL}</a>}
+          <Link href="/studio" className="hover:text-text">Creator sign in</Link>
           <ReplayIntro />
           {children}
         </nav>

@@ -41,7 +41,8 @@ const WISP_2 = ["…no screaming? Tough crowd.", "Nobody screamed. I'm crying. S
 const WISP_3 = ["Fine. Come in. Wipe your feet. (I have none.)", "Go on in. Don't touch anything. (Touch EVERYTHING.)", "Welcome! I'd shake your hand, but, you know. Ghost."];
 
 // Timeline (ms): swirl in -> tension -> ACHOO -> scatter -> reassemble -> Wisp says hi -> burst into the site.
-const T_IN = 1800, T_SNEEZE = 3250, T_FLY = 4300, T_REFORM = 5700, T_BURST = 8300, T_END = 9000;
+// Paced so every line can be read: ~2 seconds per caption.
+const T_IN = 2400, T_TENSION = 3800, T_SNEEZE = 6400, T_FLY = 8400, T_REFORM = 10200, T_BURST = 16200, T_END = 16900;
 
 export default function Intro() {
   const [run, setRun] = useState(0);        // 0 = not running
@@ -90,14 +91,14 @@ export default function Intro() {
     });
     // Per-run jokes, so a replay is not the same show twice.
     const afterSneeze = pick(AFTER_SNEEZE), reassemble = pick(REASSEMBLE), wisp2 = pick(WISP_2), wisp3 = pick(WISP_3);
-    const lines: [number, string][] = [[5650, "BOO!"], [6450, wisp2], [7350, wisp3]];
+    const lines: [number, string][] = [[10200, "BOO!"], [11500, wisp2], [13900, wisp3]];
     wisp.current?.classList.remove("show"); achoo.current?.classList.remove("go");
     if (cap.current) cap.current.textContent = "";
     if (bubble.current) bubble.current.textContent = "";
 
     const start = performance.now();
     let raf = 0, finished = false, mx = -999, my = -999, exploded = false, capNow = "", lineIdx = 0, shakeUntil = 0;
-    const setCap = (t: string) => { if (t !== capNow && cap.current) { capNow = t; cap.current.textContent = t; } };
+    const setCap = (t: string) => { if (t !== capNow && cap.current) { capNow = t; cap.current.textContent = t; if (!/\d+%$/.test(t)) { cap.current.classList.remove("bubble"); void cap.current.offsetWidth; cap.current.classList.add("bubble"); } } };
     const ease = (t: number) => 1 - Math.pow(1 - t, 3);
     const finish = () => {
       if (finished) return; finished = true;
@@ -122,8 +123,8 @@ export default function Intro() {
 
       // Captions + gags, driven by the clock.
       if (t < T_IN) setCap(`Summoning ghost… ${Math.min(99, Math.floor(ease(t / T_IN) * 99))}%`);
-      else if (t < 2400) setCap("99%… still 99%…");
-      else if (t < 2900) setCap("Wait. Is the ghost about to…?");
+      else if (t < T_TENSION) setCap("99%… still 99%…");
+      else if (t < 5200) setCap("Wait. Is the ghost about to…?");
       else if (t < T_SNEEZE) setCap("ah… ah…");
       else if (t < T_FLY) setCap(afterSneeze);
       else if (t < T_REFORM) setCap(reassemble);
@@ -138,7 +139,7 @@ export default function Intro() {
         blip(180, 0.25, 0.09);
       }
       if (shake.current) shake.current.classList.toggle("intro-shake", t < shakeUntil);
-      if (t >= 5400 && wisp.current && !wisp.current.classList.contains("show")) wisp.current.classList.add("show");
+      if (t >= 9800 && wisp.current && !wisp.current.classList.contains("show")) wisp.current.classList.add("show");
       while (lineIdx < lines.length && t >= lines[lineIdx][0]) {
         const b = bubble.current;
         if (b) { b.textContent = lines[lineIdx][1]; b.classList.remove("bubble"); void b.offsetWidth; b.classList.add("bubble"); }
@@ -152,13 +153,13 @@ export default function Intro() {
           const ang = p.a + (1 - k) * 5, rr = p.r * (1 - k);
           p.x = p.tx + Math.cos(ang) * rr * 0.9; p.y = p.ty + Math.sin(ang) * rr * 0.9;
         } else if (t < T_SNEEZE) {
-          // tension: the whole ghost trembles harder and harder
-          const q = (t - T_IN) / (T_SNEEZE - T_IN), amp = 0.9 + 7 * q * q;
+          // tension: calm at first, then the whole ghost trembles harder and harder
+          const q = Math.max(0, (t - T_TENSION) / (T_SNEEZE - T_TENSION)), amp = 0.9 + 7 * q * q;
           p.x = p.tx + Math.sin(t / 38 + p.a * 9) * amp; p.y = p.ty + Math.cos(t / 41 + p.a * 7) * amp;
         } else if (t < T_FLY) {
           p.vx *= 0.965; p.vy = p.vy * 0.965 + 0.12; p.x += p.vx; p.y += p.vy;
         } else if (t < T_REFORM) {
-          const k = 0.05 + 0.1 * ((t - T_FLY) / (T_REFORM - T_FLY));
+          const k = 0.03 + 0.08 * ((t - T_FLY) / (T_REFORM - T_FLY));
           p.x += (p.tx - p.x) * k; p.y += (p.ty - p.y) * k;
         } else if (t < T_BURST) {
           const jx = Math.sin(t / 260 + p.a * 9) * 0.9, jy = Math.cos(t / 300 + p.a * 7) * 0.9;
@@ -193,10 +194,10 @@ export default function Intro() {
       </div>
       <div ref={achoo} className="intro-achoo pointer-events-none absolute inset-x-0 top-[14%] text-center font-display text-5xl font-extrabold uppercase tracking-tight text-accent sm:text-7xl" aria-hidden="true">Achoo!</div>
       <div ref={wisp} className="intro-wisp pointer-events-none absolute inset-x-0 bottom-24 flex flex-col items-center gap-2 px-4 sm:bottom-20" aria-hidden="true">
-        <p ref={bubble} className="min-h-[2.5rem] w-max max-w-[18rem] rounded-2xl rounded-b-sm border border-line bg-surface/95 px-3.5 py-2 text-center text-sm leading-snug text-text shadow-lg sm:max-w-sm sm:text-base" />
+        <p ref={bubble} className="min-h-[2.5rem] w-max max-w-[18rem] rounded-2xl rounded-b-sm border border-line bg-surface/95 px-3.5 py-2 text-center text-[15px] font-medium leading-snug text-text shadow-lg sm:max-w-md sm:text-lg" />
         <GhostMark className="wisp-float h-16 w-16 drop-shadow-[0_10px_24px_rgb(var(--glow-a)/0.5)]" />
       </div>
-      <p ref={cap} className="pointer-events-none absolute inset-x-0 bottom-9 px-6 text-center text-sm font-medium text-muted sm:text-base" role="status" aria-live="off" />
+      <p ref={cap} className="pointer-events-none absolute inset-x-0 bottom-9 px-6 text-center text-base font-semibold text-text sm:text-xl" role="status" aria-live="off" />
       <button type="button" onClick={(e) => { e.stopPropagation(); done.current(); }} className="btn btn-ghost btn-sm absolute right-4 top-4">Skip ›</button>
     </div>
   );

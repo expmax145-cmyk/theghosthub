@@ -7,16 +7,22 @@ import { blip } from "@/lib/sound";
 export default function Interactions() {
   const path = usePathname();
 
-  // Scroll reveals: re-scan after every route change.
+  // Scroll reveals. Pages stream in after a client-side navigation, so watch the DOM for new
+  // [data-reveal] elements instead of scanning once (a one-off scan missed them and left blank gaps).
   useEffect(() => {
-    const els = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]:not(.in)"));
-    if (!els.length) return;
-    if (!("IntersectionObserver" in window)) { els.forEach((e) => e.classList.add("in")); return; }
+    if (!("IntersectionObserver" in window)) { document.querySelectorAll("[data-reveal]").forEach((e) => e.classList.add("in")); return; }
     const io = new IntersectionObserver((entries) => {
       for (const en of entries) if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
-    els.forEach((e) => io.observe(e));
-    return () => io.disconnect();
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.05 });
+    const seen = new WeakSet<Element>();
+    const scan = () => document.querySelectorAll("[data-reveal]:not(.in)").forEach((e) => { if (!seen.has(e)) { seen.add(e); io.observe(e); } });
+    scan();
+    let raf = 0;
+    const mo = new MutationObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(scan); });
+    mo.observe(document.body, { childList: true, subtree: true });
+    // Safety net: never leave content invisible if the observer misfires.
+    const t = window.setTimeout(() => document.querySelectorAll("[data-reveal]:not(.in)").forEach((e) => { const r = e.getBoundingClientRect(); if (r.top < innerHeight && r.bottom > 0) e.classList.add("in"); }), 1500);
+    return () => { io.disconnect(); mo.disconnect(); cancelAnimationFrame(raf); clearTimeout(t); };
   }, [path]);
 
   useEffect(() => {
