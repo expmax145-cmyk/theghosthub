@@ -74,7 +74,9 @@ export default function Intro() {
     if (!canvas || !ctx) { setGone(true); return; }
     const root = document.documentElement;
     const light = root.dataset.theme === "light";
-    const COLORS = light ? LIGHT : DARK;
+    const cs = getComputedStyle(root);
+    const vib = ["--v1", "--v2", "--v3", "--color-accent"].map((v) => cs.getPropertyValue(v).trim()).filter((c) => /^#|^rgb/i.test(c));
+    const COLORS = vib.length >= 3 ? vib : light ? LIGHT : DARK;
     root.style.overflow = "hidden";
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = Math.round(window.innerWidth), h = Math.round(window.innerHeight);

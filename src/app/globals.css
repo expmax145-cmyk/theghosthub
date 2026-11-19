@@ -36,12 +36,13 @@
   --color-faint: #4f677f;
   --color-accent: #0b63d1;
   --color-accent-ink: #ffffff;
-  --color-teal: #0a8a8f;
-  --color-leaf: #138a52;
-  --color-sage: #0f7a4a;
   --color-danger: #c62839;
   --glow-a: 11 99 209; --glow-b: 8 145 150; --glow-c: 19 138 82;
 }
+
+/* Vibe-aware palette: every secondary colour in the site derives from these three, so a vibe recolours everything. */
+:root { --v1: var(--g1, #7cb8ff); --v2: var(--g2, #2dd4cf); --v3: var(--g3, #5eea9a); --color-teal: var(--v2); --color-leaf: var(--v3); --color-sage: var(--v3); --color-steel: color-mix(in srgb, var(--color-accent) 55%, #9fb6cc); --color-blood: color-mix(in srgb, var(--color-accent) 40%, #0a1630); }
+:root[data-theme="light"] { --v1: var(--g1l, #0b63d1); --v2: var(--g2l, #0a8a8f); --v3: var(--g3l, #138a52); }
 
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
@@ -117,7 +118,7 @@ dialog { max-width: 100vw; max-height: 100dvh; }
 .progress { display: none; }
 @supports (animation-timeline: scroll()) {
   .progress { display: block; position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 60; pointer-events: none;
-    background: linear-gradient(90deg, #4da3ff, #2dd4cf, #4ade80); transform-origin: 0 50%; transform: scaleX(0);
+    background: linear-gradient(90deg, var(--v1), var(--v2), var(--v3)); transform-origin: 0 50%; transform: scaleX(0);
     animation: grow linear both; animation-timeline: scroll(root block); }
   @keyframes grow { to { transform: scaleX(1); } }
 }
@@ -136,7 +137,7 @@ dialog { max-width: 100vw; max-height: 100dvh; }
 
 /* Header nav underline. */
 .nav-link { position: relative; }
-.nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, #4da3ff, #2dd4cf); transform: scaleX(0); transform-origin: 0 50%; transition: transform 0.2s; }
+.nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, var(--v1), var(--v2)); transform: scaleX(0); transform-origin: 0 50%; transition: transform 0.2s; }
 .nav-link:hover::after, .nav-link:focus-visible::after { transform: scaleX(1); }
 
 /* Tiles: lift, category-coloured glow, and a soft spotlight that follows the pointer. */

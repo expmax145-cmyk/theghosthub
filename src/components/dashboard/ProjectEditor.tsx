@@ -6,6 +6,7 @@ import { DEFAULT_CATEGORIES, STATUS_LABEL, type ExtraLink, type HubFile, type Ow
 import { formatBytes, safeUrl, slugify, splitList, cx } from "@/lib/utils";
 import { validateFile } from "@/lib/files";
 import { deleteFiles, uploadFile } from "./ops";
+import { makePanVideo } from "./panVideo";
 
 interface Props {
   ownerId: string;
@@ -70,6 +71,59 @@ export default function ProjectEditor({ ownerId, project, files, releases, thumb
   const stagedThumb = staged.find((s) => s.role === "thumbnail");
   const stagedThumbUrl = useMemo(() => (stagedThumb ? URL.createObjectURL(stagedThumb.file) : null), [stagedThumb]);
   useEffect(() => () => { if (stagedThumbUrl) URL.revokeObjectURL(stagedThumbUrl); }, [stagedThumbUrl]);
+
+  const [impUrl, setImpUrl] = useState("");
+  const [impBusy, setImpBusy] = useState("");
+  const [impNotes, setImpNotes] = useState<string[]>([]);
+
+  async function runImport() {
+    const u = impUrl.trim();
+    if (!u || impBusy) return;
+    setErrors([]); setImpNotes([]); setImpBusy("Reading the link and taking screenshots… this can take up to a minute.");
+    try {
+      const res = await fetch("/api/studio/import", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url: u, categories: allCategories }) });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) { setErrors([j.error ?? "Import failed."]); return; }
+      const d = j.draft;
+      setName(d.name || name); setShortDesc((d.short_description || "").slice(0, 280)); setDesc(d.description || "");
+      if (allCategories.some((c) => c.toLowerCase() === String(d.category).toLowerCase())) { setCategory(allCategories.find((c) => c.toLowerCase() === String(d.category).toLowerCase())!); setNewCat(""); } else setNewCat(d.category || "");
+      setTechs((d.technologies ?? []).join(", ")); setTags((d.tags ?? []).join(", ")); setFeatures((d.features ?? []).join("\n"));
+      setStatus(d.status); if (d.live_demo_url) setLive(d.live_demo_url);
+      const gh = (d.links ?? []).find((l: ExtraLink) => l.label === "GitHub"); if (gh) setRepo(gh.url);
+      const vid = (d.links ?? []).find((l: ExtraLink) => l.label === "Video"); if (vid) setVideo(vid.url);
+      setExtra((d.links ?? []).filter((l: ExtraLink) => l.label === "Google Play").map((l: ExtraLink) => `${l.label} | ${l.url}`).join("\n"));
+      setMore(true);
+
+      const toFile = (img: { name: string; mime: string; data: string }) => {
+        const bin = atob(img.data); const arr = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        return new File([arr], img.name, { type: img.mime });
+      };
+      const add: Staged[] = []; const errs: string[] = [];
+      let pan: File | null = null; let firstShot: File | null = null;
+      for (const img of j.images as { name: string; role: string; mime: string; data: string }[]) {
+        const f = toFile(img);
+        if (img.role === "pan") { pan = f; continue; }
+        const role = img.role === "thumbnail" ? "thumbnail" : "screenshot";
+        const v = validateFile(f, role);
+        if (!v.ok) { errs.push(v.error!); continue; }
+        if (role === "screenshot" && !firstShot) firstShot = f;
+        add.push({ file: f, role, isPublic: true });
+      }
+      setStaged((s) => [...s.filter((x) => x.role === "attachment" || x.role === "video"), ...add]);
+      const notes: string[] = [...(j.notes ?? [])];
+      const src = pan ?? firstShot;
+      if (src && j.kind === "website") {
+        setImpBusy("Recording a preview video (about 8 seconds)…");
+        const vf = await makePanVideo(src);
+        if (vf) {
+          const v = validateFile(vf, "video");
+          if (v.ok) setStaged((s) => [...s.filter((x) => x.role !== "video"), { file: vf, role: "video", isPublic: true }]); else errs.push(v.error!);
+        } else notes.push("Your browser could not record the preview video. Add one manually.");
+      }
+      setImpNotes(notes); if (errs.length) setErrors(errs);
+    } catch { setErrors(["Import failed. Check your connection and try again."]); } finally { setImpBusy(""); }
+  }
 
   const allCategories = useMemo(() => [...new Set([...DEFAULT_CATEGORIES, ...categories])], [categories]);
 
@@ -196,6 +250,20 @@ export default function ProjectEditor({ ownerId, project, files, releases, thumb
       </div>
 
       <form className="space-y-7 px-4 pb-28 pt-5 sm:px-6" onSubmit={(e) => { e.preventDefault(); save("keep"); }}>
+        {isNew && (
+          <section className="space-y-3 rounded-xl border border-accent/30 bg-accent/5 p-4" aria-label="Import from a link">
+            <h3 className="font-display text-base">✨ Import from a link</h3>
+            <p className="text-xs text-muted">Paste a website, Google Play, or direct APK link. Name, descriptions, category, technologies, screenshots, thumbnail and a preview video are filled in for you to review.</p>
+            <div className="flex gap-2">
+              <input className="field" inputMode="url" placeholder="https://…" value={impUrl} aria-label="Website or APK link" onChange={(e) => setImpUrl(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); runImport(); } }} disabled={!!impBusy || busy} />
+              <button type="button" className="btn btn-primary shrink-0" onClick={runImport} disabled={!!impBusy || busy || !impUrl.trim()}>{impBusy ? "Importing…" : "Import"}</button>
+            </div>
+            {impBusy && <p className="text-xs text-accent" role="status">{impBusy}</p>}
+            {impNotes.length > 0 && <ul className="list-disc space-y-1 pl-4 text-xs text-muted">{impNotes.map((n, i) => <li key={i}>{n}</li>)}</ul>}
+          </section>
+        )}
+
         <section className="space-y-4">
           <div><label className="label" htmlFor="pn">Name *</label>
             <input id="pn" className="field" value={name} maxLength={120} onChange={(e) => setName(e.target.value)} autoFocus={isNew} placeholder="Apex Horizon 3D" /></div>

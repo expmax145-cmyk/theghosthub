@@ -26,6 +26,8 @@ const csp = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  serverExternalPackages: ["@sparticuz/chromium", "puppeteer-core"],
+  outputFileTracingIncludes: { "/api/studio/import": ["./node_modules/@sparticuz/chromium/bin/**"] },
   reactStrictMode: true,
   async redirects() {
     return [

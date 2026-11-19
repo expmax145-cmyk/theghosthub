@@ -23,13 +23,15 @@ const profiles = [{ id: U(900), display_name: "Expmax", avatar_url: null, headli
 const hues = [30, 200, 150, 280, 10, 90];
 const svg = (key) => { const h = hues[[...key].reduce((a, c) => a + c.charCodeAt(0), 0) % hues.length]; return `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${h} 45% 28%)"/><stop offset="1" stop-color="hsl(${(h + 40) % 360} 35% 12%)"/></linearGradient></defs><rect width="800" height="500" fill="url(#g)"/><circle cx="560" cy="180" r="90" fill="hsl(${h} 70% 62% / .35)"/></svg>`; };
 const send = (res, code, body, type = "application/json") => { res.writeHead(code, { "content-type": type, "access-control-allow-origin": "*", "access-control-allow-headers": "*", "access-control-allow-methods": "*" }); res.end(typeof body === "string" ? body : JSON.stringify(body)); };
-http.createServer((req, res) => {
+http.createServer((req, res) => { if (process.env.MOCK_LOG) console.log(req.method, req.url, req.headers.accept);
   const u = new URL(req.url, "http://x");
   if (req.method === "OPTIONS") return send(res, 204, "");
+  if (u.pathname === "/auth/v1/user") return send(res, 200, { id: U(900), aud: "authenticated", role: "authenticated", email: "owner@example.com", app_metadata: {}, user_metadata: {}, created_at: "2026-01-01T00:00:00Z" });
   if (u.pathname === "/rest/v1/projects") return send(res, 200, process.env.MOCK_EMPTY ? [] : projects);
   if (u.pathname === "/rest/v1/files") return send(res, 200, files);
   if (u.pathname === "/rest/v1/releases") return send(res, 200, releases);
-  if (u.pathname === "/rest/v1/profiles") return send(res, 200, profiles);
+  if (u.pathname === "/rest/v1/rpc/is_owner") return send(res, 200, true);
+  if (u.pathname === "/rest/v1/profiles") return send(res, 200, (String(req.headers.accept).includes("pgrst.object") || u.searchParams.has("id")) ? { ...profiles[0], is_owner: true } : profiles);
   if (u.pathname.startsWith("/storage/v1/object/sign/hub-files") && req.method === "POST") {
     let b = ""; req.on("data", (c) => (b += c)); req.on("end", () => { const { paths } = JSON.parse(b || "{}"); send(res, 200, (paths ?? []).map((p) => ({ path: p, signedURL: `/object/sign/hub-files/${p}?token=t`, error: null }))); }); return;
   }

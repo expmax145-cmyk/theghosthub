@@ -4,6 +4,7 @@ import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import PaletteButton from "./PaletteButton";
 import SoundToggle from "./SoundToggle";
+import Preferences from "./Preferences";
 
 export default function SiteHeader({ wide = false }: { wide?: boolean }) {
   return (
@@ -17,6 +18,7 @@ export default function SiteHeader({ wide = false }: { wide?: boolean }) {
           </Link>
           <PaletteButton />
           <SoundToggle />
+          <Preferences />
           <ThemeToggle />
         </nav>
       </div>

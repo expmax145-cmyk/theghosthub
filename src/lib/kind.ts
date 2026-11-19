@@ -26,7 +26,7 @@ export const KIND_LABEL: Record<Kind, string> = { app: "APK", game: "Game", webs
 export const KIND_ACTION: Record<Kind, string> = { app: "Install ↓", game: "Play ▶", website: "Visit ↗", project: "View" };
 
 /** Stable accent colour per category (Play Store-style colour coding). Same name always gives the same colour. */
-const PALETTE = ["#4da3ff", "#2dd4cf", "#4ade80", "#7cb8ff", "#14b8b0", "#22b866"];
+const PALETTE = ["var(--color-accent)", "var(--v2)", "var(--v3)", "var(--v1)", "color-mix(in srgb, var(--v2) 70%, var(--color-accent))", "color-mix(in srgb, var(--v3) 70%, var(--color-accent))"];
 export function categoryColor(name: string): string {
   let h = 0;
   for (const ch of name.toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0;

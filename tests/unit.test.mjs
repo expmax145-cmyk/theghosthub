@@ -36,3 +36,22 @@ test("randomKey is unguessable and leaks no filename", () => {
   assert.notEqual(a, b); assert.match(a, /^\d{4}\/\d{2}\/[0-9a-f]{36}\.apk$/);
 });
 test("SVG is never rendered inline", () => { assert.equal(isInlineImage("image/svg+xml"), false); assert.equal(isInlineImage("image/png"), true); assert.equal(extOf("A.B.PNG"), "png"); });
+
+import { analyzeHtml, guessCategory, decode } from "../src/lib/import/analyze.ts";
+
+test("import: analyzeHtml extracts name, description, tech, images, links", () => {
+  const html = `<html><head><title>Pixel Racer | Free game</title><meta name="description" content="A fast racing game &amp; more."><meta property="og:image" content="/og.png"><script src="/phaser.min.js"></script></head><body><h1>Pixel Racer</h1><ul><li>Eight unlockable cars with handling</li></ul><a href="https://github.com/a/b">code</a></body></html>`;
+  const d = analyzeHtml(html, "https://example.com/play", ["Games", "Websites"]);
+  assert.equal(d.name, "Pixel Racer");
+  assert.equal(d.short_description, "A fast racing game & more.");
+  assert.equal(d.category, "Games");
+  assert.ok(d.technologies.includes("Phaser"));
+  assert.equal(d.imageCandidates[0], "https://example.com/og.png");
+  assert.deepEqual(d.links, [{ label: "GitHub", url: "https://github.com/a/b" }]);
+  assert.deepEqual(d.features, ["Eight unlockable cars with handling"]);
+});
+test("import: decode + category fallback", () => {
+  assert.equal(decode("a &amp; b &#33; &#x41;"), "a & b ! A");
+  assert.equal(guessCategory("a plain page", [], false, ["Websites"]), "Websites");
+  assert.equal(guessCategory("my app", [], true, ["Android Applications"]), "Android Applications");
+});

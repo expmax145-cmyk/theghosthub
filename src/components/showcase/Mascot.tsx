@@ -68,7 +68,7 @@ export default function Mascot({ say, className = "" }: { say?: string; classNam
       <button ref={root} type="button" aria-label="Wisp the ghost. Click to chat." onClick={() => { speak(LINES[n % LINES.length]); setN(n + 1); sfx.giggle(); }} className={`wisp-float block w-full ${spin ? "wisp-spin" : ""} cursor-pointer outline-offset-4 transition-transform active:scale-90`}>
         <svg viewBox="0 0 24 26" className="h-full w-full overflow-visible drop-shadow-[0_12px_28px_rgb(var(--glow-a)/0.55)]" aria-hidden="true">
           <defs>
-            <linearGradient id="wisp-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#7cb8ff" /><stop offset="0.55" stopColor="#2dd4cf" /><stop offset="1" stopColor="#4ade80" /></linearGradient>
+            <linearGradient id="wisp-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style={{ stopColor: "var(--v1)" }} /><stop offset="0.55" style={{ stopColor: "var(--v2)" }} /><stop offset="1" style={{ stopColor: "var(--v3)" }} /></linearGradient>
           </defs>
           <path fill="url(#wisp-g)" d={GHOST_PATH} />
           <ellipse cx="7.2" cy="13.4" rx="1.5" ry="0.9" fill="#bff5e8" opacity="0.55" /><ellipse cx="16.8" cy="13.4" rx="1.5" ry="0.9" fill="#bff5e8" opacity="0.55" />

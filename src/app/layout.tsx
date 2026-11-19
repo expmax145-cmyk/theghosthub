@@ -3,7 +3,6 @@ import "./globals.css";
 import BackToTop from "@/components/site/BackToTop";
 import CommandPalette from "@/components/site/CommandPalette";
 import Interactions from "@/components/site/Interactions";
-import VibePicker from "@/components/site/VibePicker";
 import CursorFx from "@/components/site/CursorFx";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theghosthub.vercel.app";
@@ -33,7 +32,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <BackToTop />
         <CommandPalette />
         <Interactions />
-        <VibePicker />
         <CursorFx />
       </body>
     </html>
