@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { musicOn, setMusic, sfx } from "@/lib/sound";
+import { surpriseHref, goTo, openPalette } from "@/lib/palette";
 
 const VIBES = [
   { id: "", name: "Ocean", a: "#4da3ff", b: "#2dd4cf" },
@@ -54,6 +56,16 @@ export default function Preferences() {
       </button>
       {open && (
         <div role="dialog" aria-label="Preferences" className="absolute right-0 top-11 z-50 w-64 max-w-[calc(100vw-2rem)] space-y-4 rounded-2xl border border-line bg-surface p-4 text-left shadow-2xl">
+          <nav aria-label="Menu" className="grid gap-1 border-b border-line/70 pb-3 text-sm font-medium sm:hidden">
+            {[["Work", "/#work"], ["About", "/about"], ["Contact", "/contact"], ["Creator sign in", "/studio"]].map(([l, h]) => (
+              <Link key={h} href={h} onClick={() => setOpen(false)} className="rounded-lg px-2 py-2 text-text hover:bg-raised">{l}</Link>
+            ))}
+          </nav>
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setOpen(false); openPalette(); }}>Search ⌕</button>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => { const h = surpriseHref(); setOpen(false); if (h) goTo(h); }}>Surprise ✦</button>
+            <button type="button" className="btn btn-ghost btn-sm col-span-2" onClick={() => { setOpen(false); try { sessionStorage.removeItem("ghosthub-intro-v2"); } catch { /* blocked */ } if (location.pathname === "/") window.dispatchEvent(new Event("ghosthub:intro")); else location.assign("/"); }}>Replay intro ✦</button>
+          </div>
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-faint">Colour vibe</p>
             <div className="grid grid-cols-2 gap-2" role="group" aria-label="Colour vibe">

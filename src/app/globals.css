@@ -27,18 +27,38 @@
 :root { color-scheme: dark; --glow-a: 59 142 246; --glow-b: 20 200 190; --glow-c: 52 211 120; }
 :root[data-theme="light"] {
   color-scheme: light;
-  --color-ink: #f0f7fd;
-  --color-surface: #ffffff;
-  --color-raised: #e3eff9;
-  --color-line: #cbdeee;
-  --color-text: #08192b;
-  --color-muted: #37506a;
-  --color-faint: #4f677f;
-  --color-accent: #0b63d1;
+  --color-ink: #d6e9fb;
+  --color-surface: rgb(255 255 255 / 0.88);
+  --color-raised: #e4f1fd;
+  --color-line: #b4d0ea;
+  --color-text: #07172a;
+  --color-muted: #2f4963;
+  --color-faint: #476079;
+  --color-accent: #0a5fd8;
   --color-accent-ink: #ffffff;
   --color-danger: #c62839;
-  --glow-a: 11 99 209; --glow-b: 8 145 150; --glow-c: 19 138 82;
+  --glow-a: 24 120 240; --glow-b: 0 170 175; --glow-c: 30 170 100;
 }
+/* Light mode = the same ocean night, seen at noon: luminous sky gradient, glass cards, coloured glow. */
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(900px 520px at 10% -8%, rgb(var(--glow-a) / 0.34), transparent 70%),
+    radial-gradient(800px 480px at 95% -4%, rgb(var(--glow-b) / 0.26), transparent 70%),
+    radial-gradient(900px 600px at 50% 105%, rgb(var(--glow-c) / 0.18), transparent 70%),
+    linear-gradient(180deg, #c5e1fb 0%, #dcf0fb 40%, #e9f8f4 100%);
+  background-repeat: no-repeat;
+  background-color: #dcecfb;
+}
+:root[data-theme="light"] .aurora::before { background: radial-gradient(closest-side, rgb(var(--glow-a) / 0.5), transparent); }
+:root[data-theme="light"] .aurora::after { background: radial-gradient(closest-side, rgb(var(--glow-b) / 0.4), transparent); }
+:root[data-theme="light"] .tile, :root[data-theme="light"] .door, :root[data-theme="light"] article.card, :root[data-theme="light"] dialog, :root[data-theme="light"] [role="dialog"] {
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.9) inset, 0 16px 36px -20px rgb(var(--glow-a) / 0.55);
+}
+:root[data-theme="light"] dialog, :root[data-theme="light"] [role="dialog"]:not([data-intro]), :root[data-theme="light"] [role="listbox"] { background-color: #f4faff; }
+:root[data-theme="light"] .site-header { box-shadow: 0 10px 30px -22px rgb(var(--glow-a) / 0.7); }
+:root[data-theme="light"] .btn-ghost, :root[data-theme="light"] .chip, :root[data-theme="light"] .field { backdrop-filter: blur(8px); }
+:root[data-theme="light"] .field, :root[data-theme="light"] .chip { background-color: rgb(255 255 255 / 0.7); }
+:root[data-theme="light"] .btn-primary { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4), 0 12px 28px -10px rgb(var(--glow-a) / 0.85); }
 
 /* Vibe-aware palette: every secondary colour in the site derives from these three, so a vibe recolours everything. */
 :root { --v1: var(--g1, #7cb8ff); --v2: var(--g2, #2dd4cf); --v3: var(--g3, #5eea9a); --color-teal: var(--v2); --color-leaf: var(--v3); --color-sage: var(--v3); --color-steel: color-mix(in srgb, var(--color-accent) 55%, #9fb6cc); --color-blood: color-mix(in srgb, var(--color-accent) 40%, #0a1630); }

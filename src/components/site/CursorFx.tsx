@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-/** Desktop-only: a short trail of sparkles behind the pointer, and a burst on click. */
+/** A short trail of sparkles behind the pointer, and a burst on click. */
 export default function CursorFx() {
   const cvs = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
-    if (!matchMedia("(hover: hover) and (pointer: fine)").matches || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const c = cvs.current, ctx = c?.getContext("2d");
     if (!c || !ctx) return;
     const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -21,14 +21,14 @@ export default function CursorFx() {
     const pref = (e: Event) => { enabled = (e as CustomEvent<boolean>).detail; };
     addEventListener("ghosthub:sparkle", pref);
     const move = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse" || !enabled) return;
+      if (!enabled) return;
       tx = e.clientX; ty = e.clientY;
       if (Math.hypot(tx - lastX, ty - lastY) > 16) {
         lastX = tx; lastY = ty;
         for (let i = 0; i < 2; i++) sp.push({ x: tx, y: ty, vx: (Math.random() - 0.5) * 1.2, vy: Math.random() * 0.8 + 0.2, life: 1, s: 2 + Math.random() * 3, hue: Math.random() });
       }
     };
-    const down = () => { if (!enabled) return; for (let i = 0; i < 10; i++) { const a = Math.random() * 6.28, v = 1 + Math.random() * 2.5; sp.push({ x: tx, y: ty, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, s: 2 + Math.random() * 3, hue: Math.random() }); } };
+    const down = (e: PointerEvent) => { if (!enabled) return; tx = e.clientX; ty = e.clientY; for (let i = 0; i < 10; i++) { const a = Math.random() * 6.28, v = 1 + Math.random() * 2.5; sp.push({ x: tx, y: ty, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, s: 2 + Math.random() * 3, hue: Math.random() }); } };
     const frame = () => {
       if (++tick % 90 === 0) rgb = color();
       ctx.clearRect(0, 0, innerWidth, innerHeight);

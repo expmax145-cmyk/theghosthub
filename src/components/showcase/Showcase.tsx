@@ -188,7 +188,7 @@ export default function Showcase({ data }: { data: ShowcaseData }) {
           <Constellation />
           <div className="relative mx-auto max-w-[1500px] px-4 pb-6 pt-7 sm:px-6 sm:pb-8 sm:pt-10">
             <Mascot say={say} className="absolute right-4 top-3 z-10 h-16 w-14 sm:right-10 sm:top-8 sm:h-44 sm:w-40 lg:right-16 lg:h-52 lg:w-48" />
-            <p className="rise inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 px-3 py-1 text-xs font-medium text-muted backdrop-blur">
+            <p className="rise hidden items-center gap-2 sm:inline-flex rounded-full border border-line bg-surface/60 px-3 py-1 text-xs font-medium text-muted backdrop-blur">
               <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-leaf opacity-60" /><span className="relative inline-flex h-2 w-2 rounded-full bg-leaf" /></span>
               Live &middot; hover a tile to preview<span className="hidden sm:contents"> &middot; press <kbd className="kbd">Ctrl K</kbd></span>
             </p>
