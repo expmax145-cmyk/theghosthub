@@ -8,6 +8,7 @@ import { captureScreens } from "@/lib/import/screenshots";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
+const DEADLINE_MS = 54_000; // leave headroom under maxDuration so we always answer with JSON
 
 const MAX_APK = 50 * 1024 * 1024;
 const b64 = (b: Uint8Array) => Buffer.from(b).toString("base64");
@@ -23,7 +24,7 @@ async function grabImages(cands: string[], max: number): Promise<{ mime: string;
     try {
       const r = await safeFetch(u, { maxBytes: 4_000_000, timeoutMs: 8000, accept: "image/*" });
       const mime = r.status === 200 && !r.truncated ? imgType(r.type, r.bytes) : null;
-      if (mime && r.bytes.length > 2500) out.push({ mime, bytes: r.bytes });
+      if (mime && r.bytes.length > 2500 && r.bytes.length < 900_000) out.push({ mime, bytes: r.bytes });
     } catch { /* skip unreachable image */ }
   }
   return out;
@@ -42,8 +43,9 @@ export async function POST(req: NextRequest) {
   if (!url) return NextResponse.json({ error: "Paste a link first." }, { status: 400 });
 
   const notes: string[] = [];
+  const t0 = Date.now();
   try {
-    const first = await safeFetch(url, { maxBytes: MAX_APK + 1, timeoutMs: 45_000, accept: "text/html,application/vnd.android.package-archive,*/*" });
+    const first = await safeFetch(url, { maxBytes: MAX_APK + 1, timeoutMs: 25_000, accept: "text/html,application/vnd.android.package-archive,*/*" });
     const isApk = /android\.package-archive/.test(first.type) || /\.apk($|\?)/i.test(first.url) || (first.bytes[0] === 0x50 && first.bytes[1] === 0x4b);
 
     if (isApk) {
@@ -79,20 +81,30 @@ export async function POST(req: NextRequest) {
 
     const images: Img[] = [];
     const slug = (draft.name || "site").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "site";
-    if (!isPlay) {
-      const shots = await captureScreens(first.url).catch((e) => { notes.push(`Live screenshots unavailable (${e instanceof Error ? e.message : "browser error"}); used the site's own images instead.`); return null; });
-      if (shots) {
-        for (const s of shots.images) images.push({ name: `${slug}-${s.label}.jpg`, role: s.label === "fullpage" ? "pan" : "screenshot", mime: "image/jpeg", data: b64(s.bytes) });
-        if (shots.title && !draft.name) draft.name = shots.title;
-      }
+    // Screenshots (slow) and the site's own images (fast) run side by side.
+    const budget = Math.max(8000, DEADLINE_MS - (Date.now() - t0) - 6000);
+    const [shots, got] = await Promise.all([
+      isPlay ? Promise.resolve(null) : captureScreens(first.url, budget).catch((e) => { notes.push(`Live screenshots were unavailable (${e instanceof Error ? e.message.slice(0, 80) : "browser error"}), so the site's own images were used instead.`); return null; }),
+      grabImages(draft.imageCandidates, isPlay ? 7 : 4),
+    ]);
+    if (shots) {
+      for (const s of shots.images) images.push({ name: `${slug}-${s.label}.jpg`, role: s.label === "fullpage" ? "pan" : "screenshot", mime: "image/jpeg", data: b64(s.bytes) });
+      if (shots.title && !draft.name) draft.name = shots.title;
     }
-    const got = await grabImages(draft.imageCandidates, isPlay ? 7 : 4);
     got.forEach((g, i) => {
       const ext = g.mime.split("/")[1].replace("jpeg", "jpg");
-      const role = i === 0 && !images.some((x) => x.role === "thumbnail") && (!isPlay || i === 0) ? "thumbnail" : "screenshot";
+      const role = i === 0 && !images.some((x) => x.role === "thumbnail") ? "thumbnail" : "screenshot";
       images.push({ name: `${slug}-${role === "thumbnail" ? "cover" : "image" + i}.${ext}`, role, mime: g.mime, data: b64(g.bytes) });
     });
     if (!images.some((i) => i.role === "thumbnail") && images.length) { const s = images.find((i) => i.role === "screenshot")!; s.role = "thumbnail"; }
+    // Vercel caps a response at 4.5 MB: drop the heaviest extras until the payload fits.
+    const size = () => images.reduce((n, i) => n + i.data.length, 0);
+    while (size() > 3_400_000 && images.length > 1) {
+      const heavy = [...images].filter((i) => i.role !== "thumbnail").sort((a, b) => b.data.length - a.data.length)[0];
+      if (!heavy) break;
+      images.splice(images.indexOf(heavy), 1);
+      if (!notes.some((n) => n.startsWith("Some large"))) notes.push("Some large images were skipped to keep the import small.");
+    }
     if (!images.length) notes.push("No usable images were found. Add a thumbnail manually.");
     const { imageCandidates: _c, ...rest } = draft; void _c;
     return NextResponse.json({ kind: isPlay ? "play" : "website", draft: rest, images, notes });
